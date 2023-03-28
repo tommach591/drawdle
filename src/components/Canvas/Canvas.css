@@ -1,0 +1,22 @@
+.Canvas {
+  display: flex;
+  justify-content: center;
+}
+
+.Canvas > canvas {
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.Controls {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  margin-left: 1rem;
+}
+
+.Controls > * {
+  width: 100%;
+  margin: 0.25rem;
+}
