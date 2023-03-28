@@ -1,1 +1,3 @@
-# Drawdle - The daily doodle web app!
+# Drawdle
+
+The daily doodle web app!
