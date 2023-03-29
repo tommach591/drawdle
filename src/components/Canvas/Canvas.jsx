@@ -79,6 +79,10 @@ function Canvas() {
             setColor(event.target.value);
           }}
         />
+        <div className="History">
+          <button>Undo</button>
+          <button>Redo</button>
+        </div>
         <button
           className="Clear"
           onClick={() => {
@@ -96,6 +100,7 @@ function Canvas() {
         >
           Clear
         </button>
+        <button>Submit</button>
       </div>
     </div>
   );
