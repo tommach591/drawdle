@@ -1,12 +1,3 @@
----
-name: Pull request
-about: Create a pull request to fix an issue
-title: ''
-labels: ''
-assignees: ''
-
----
-
 **Closes which Issue**
 Type "Closes #" followed by the issue number.
 
