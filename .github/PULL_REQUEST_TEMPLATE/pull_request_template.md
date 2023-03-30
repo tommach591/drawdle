@@ -14,4 +14,4 @@ Type "Closes #" followed by the issue number.
 How did you fix the issue?
 
 **Screenshots**
-If applicable, add screenshots to help explain your problem.
+If applicable, add screenshots to help explain your solution.
