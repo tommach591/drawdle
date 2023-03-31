@@ -3,22 +3,72 @@
   justify-content: center;
 }
 
-.Canvas > canvas {
+.Whiteboard {
+  position: relative;
+  overflow: hidden;
+}
+
+.Whiteboard:hover {
+  cursor: none;
+}
+
+.Whiteboard > canvas {
   border: 1px solid black;
   border-radius: 5px;
 }
 
+.Paintbrush {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: transparent;
+  border: 1px solid black;
+  border-radius: 100%;
+  transform: translate(-50%, -50%);
+  z-index: 999;
+  pointer-events: none;
+}
+
 .Controls {
+  width: 10.5rem;
   display: flex;
   flex-direction: column;
   position: relative;
 
   margin-left: 1rem;
+  margin-right: 1rem;
 }
 
 .Controls > * {
   width: 100%;
   margin: 0.25rem;
+}
+
+.Size {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Number {
+  width: 2rem;
+  text-align: center;
+  border: 1px solid black;
+  border-radius: 3px;
+
+  outline: none;
+}
+
+.Number::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.Color {
+  border: none;
+  background: none;
+
+  padding: 0rem;
 }
 
 .History {
@@ -28,6 +78,6 @@
 }
 
 .History > * {
-  width: 4rem;
+  width: 5rem;
   margin: auto;
 }

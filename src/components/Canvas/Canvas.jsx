@@ -3,10 +3,11 @@ import "./Canvas.css";
 
 function Canvas() {
   const canvasRef = useRef(null);
+  const whiteboardRef = useRef(null);
   const [mouseData, setMouseData] = useState({ x: 0, y: 0 });
   const [canvasCTX, setCanvasCTX] = useState(null);
   const [color, setColor] = useState("#000000");
-  const [size, setSize] = useState(5);
+  const [size, setSize] = useState(25);
 
   const [undo, setUndo] = useState([[]]);
   const [redo, setRedo] = useState([]);
@@ -40,8 +41,8 @@ function Canvas() {
   }, [undo, canvasCTX]);
 
   const setPos = (event) => {
-    const localX = event.clientX - event.target.offsetLeft;
-    const localY = event.clientY - event.target.offsetTop;
+    const localX = event.clientX - whiteboardRef.current.offsetLeft;
+    const localY = event.clientY - whiteboardRef.current.offsetTop;
     setMouseData({
       x: localX,
       y: localY,
@@ -51,8 +52,8 @@ function Canvas() {
   const draw = (event) => {
     if (event.buttons !== 1) return;
     let newUndo = [...undo];
-    const localX = event.clientX - event.target.offsetLeft;
-    const localY = event.clientY - event.target.offsetTop;
+    const localX = event.clientX - whiteboardRef.current.offsetLeft;
+    const localY = event.clientY - whiteboardRef.current.offsetTop;
 
     let point = {
       x_start: mouseData.x,
@@ -95,34 +96,60 @@ function Canvas() {
 
   return (
     <div className="Canvas">
-      <canvas
-        ref={canvasRef}
-        onMouseEnter={(event) => setPos(event)}
-        onMouseMove={(event) => {
-          setPos(event);
-          draw(event);
-        }}
-        onMouseDown={(event) => {
-          setRedo([]);
-          setPos(event);
-          draw(event);
-        }}
-        onMouseUp={() => {
-          setUndo([...undo, []]);
-        }}
-      />
-
-      <div className="Controls">
-        <input
-          className="Size"
-          type="range"
-          value={size}
-          max={40}
-          step={1}
-          onChange={(event) => {
-            setSize(event.target.value);
+      <div className="Whiteboard" ref={whiteboardRef}>
+        <canvas
+          ref={canvasRef}
+          onMouseEnter={(event) => setPos(event)}
+          onMouseMove={(event) => {
+            event.preventDefault();
+            setPos(event);
+            draw(event);
+          }}
+          onMouseDown={(event) => {
+            event.preventDefault();
+            setRedo([]);
+            setPos(event);
+            draw(event);
+          }}
+          onMouseUp={() => {
+            setUndo([...undo, []]);
           }}
         />
+        <div
+          className="Paintbrush"
+          style={{
+            left: `${mouseData.x}px`,
+            top: `${mouseData.y}px`,
+            width: `${size}px`,
+            height: `${size}px`,
+          }}
+        ></div>
+      </div>
+
+      <div className="Controls">
+        <div className="Size">
+          <input
+            className="Number"
+            type="number"
+            value={size}
+            max={100}
+            min={1}
+            onChange={(event) => {
+              setSize(event.target.value);
+            }}
+          />
+          <input
+            className="Range"
+            type="range"
+            value={size}
+            max={100}
+            min={1}
+            step={1}
+            onChange={(event) => {
+              setSize(event.target.value);
+            }}
+          />
+        </div>
         <input
           className="Color"
           type="color"
@@ -150,7 +177,7 @@ function Canvas() {
         <button
           className="Clear"
           onClick={() => {
-            const response = window.confirm("Clear canvas?");
+            const response = window.confirm("Clear canvas?\n\nCannot undo!");
             if (response) {
               const ctx = canvasCTX;
               ctx.clearRect(
@@ -159,6 +186,8 @@ function Canvas() {
                 canvasRef.current.width,
                 canvasRef.current.height
               );
+              setUndo([[]]);
+              setRedo([]);
             }
           }}
         >
