@@ -156,6 +156,7 @@ function Canvas() {
             return (
               <div
                 className="DefaultSizes"
+                key={size}
                 onClick={() => {
                   setSize(size);
                 }}
