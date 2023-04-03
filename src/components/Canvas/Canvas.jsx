@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import "./Canvas.css";
 
 function Canvas() {
+  const defaultSize = [1, 5, 10, 25, 50, 100];
   const canvasRef = useRef(null);
   const whiteboardRef = useRef(null);
   const [mouseData, setMouseData] = useState({ x: 0, y: 0 });
   const [canvasCTX, setCanvasCTX] = useState(null);
   const [color, setColor] = useState("#000000");
-  const [size, setSize] = useState(25);
+  const [size, setSize] = useState(defaultSize[3]);
 
   const [undo, setUndo] = useState([[]]);
   const [redo, setRedo] = useState([]);
@@ -123,7 +124,7 @@ function Canvas() {
             width: `${size}px`,
             height: `${size}px`,
           }}
-        ></div>
+        />
       </div>
 
       <div className="Controls">
@@ -149,6 +150,21 @@ function Canvas() {
               setSize(event.target.value);
             }}
           />
+        </div>
+        <div className="SizeGrid">
+          {defaultSize.map((size) => {
+            return (
+              <div
+                className="DefaultSizes"
+                onClick={() => {
+                  setSize(size);
+                }}
+              >
+                <div style={{ width: size, height: size }} />
+                <h1>{size}</h1>
+              </div>
+            );
+          })}
         </div>
         <input
           className="Color"

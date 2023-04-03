@@ -64,6 +64,44 @@
   margin: 0;
 }
 
+.SizeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 5px;
+}
+
+.DefaultSizes {
+  width: 3rem;
+  height: 3rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.DefaultSizes:hover {
+  cursor: pointer;
+}
+
+.DefaultSizes > div {
+  max-width: 15px;
+  max-height: 15px;
+  background: black;
+  border-radius: 50%;
+}
+
+.DefaultSizes > h1 {
+  font-size: 12px;
+  position: absolute;
+  bottom: 0px;
+}
+
 .Color {
   border: none;
   background: none;
