@@ -50,9 +50,11 @@ function Canvas() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    canvas.width = width;
-    canvas.height = height;
+    const ctx = canvas.getContext("2d", { alpha: false });
+    const dpr = window.devicePixelRatio;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
     setCanvasCTX(ctx);
   }, [canvasRef]);
 
@@ -107,8 +109,8 @@ function Canvas() {
   }, [undo, canvasCTX]);
 
   const setPos = (event) => {
-    const localX = event.clientX - whiteboardRef.current.offsetLeft;
-    const localY = event.clientY - whiteboardRef.current.offsetTop;
+    const localX = Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
+    const localY = Math.floor(event.clientY - whiteboardRef.current.offsetTop);
     setMouseData({
       x: localX,
       y: localY,
@@ -118,8 +120,8 @@ function Canvas() {
   const draw = (event) => {
     if (event.buttons !== 1) return;
     let newUndo = [...undo];
-    const localX = event.clientX - whiteboardRef.current.offsetLeft;
-    const localY = event.clientY - whiteboardRef.current.offsetTop;
+    const localX = Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
+    const localY = Math.floor(event.clientY - whiteboardRef.current.offsetTop);
 
     let point = {
       x_start: mouseData.x,
