@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import "./Canvas.css";
 
 function Canvas() {
@@ -10,11 +10,43 @@ function Canvas() {
   const [color, setColor] = useState("#000000");
   const [size, setSize] = useState(defaultSize[3]);
 
+  const [keys, setKeys] = useState({
+    ctrl: false,
+    z: false,
+    y: false,
+  });
+
   const [undo, setUndo] = useState([[]]);
   const [redo, setRedo] = useState([]);
 
   const width = 1024;
   const height = 768;
+
+  const handleUndo = useCallback(() => {
+    let newUndo = [...undo];
+    newUndo.pop();
+    if (newUndo.length > 0) {
+      let stroke = newUndo.pop();
+      let newRedo = [...redo];
+      newRedo.push(stroke);
+      setRedo(newRedo);
+    }
+    newUndo.push([]);
+    setUndo(newUndo);
+  }, [undo, redo]);
+
+  const handleRedo = useCallback(() => {
+    let newUndo = [...undo];
+    let newRedo = [...redo];
+
+    if (newRedo.length > 0) {
+      newUndo.pop();
+      newUndo.push(newRedo.pop());
+      newUndo.push([]);
+      setUndo(newUndo);
+      setRedo(newRedo);
+    }
+  }, [undo, redo]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -23,6 +55,39 @@ function Canvas() {
     canvas.height = height;
     setCanvasCTX(ctx);
   }, [canvasRef]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const newKeys = JSON.parse(JSON.stringify(keys));
+      const { key } = event;
+      if (key === "Control") newKeys.ctrl = true;
+      if (key === "z") newKeys.z = true;
+      if (key === "y") newKeys.y = true;
+
+      if (newKeys.ctrl && newKeys.z) handleUndo();
+      if (newKeys.ctrl && newKeys.y) handleRedo();
+
+      setKeys(newKeys);
+    };
+
+    const handleKeyUp = (event) => {
+      const newKeys = JSON.parse(JSON.stringify(keys));
+      const { key } = event;
+      if (key === "Control") newKeys.ctrl = false;
+      if (key === "z") newKeys.z = false;
+      if (key === "y") newKeys.y = false;
+
+      setKeys(newKeys);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [keys, handleUndo, handleRedo]);
 
   useEffect(() => {
     const ctx = canvasCTX;
@@ -67,32 +132,6 @@ function Canvas() {
 
     newUndo[newUndo.length - 1].push(point);
     setUndo(newUndo);
-  };
-
-  const handleUndo = () => {
-    let newUndo = [...undo];
-    newUndo.pop();
-    if (newUndo.length > 0) {
-      let stroke = newUndo.pop();
-      let newRedo = [...redo];
-      newRedo.push(stroke);
-      setRedo(newRedo);
-    }
-    newUndo.push([]);
-    setUndo(newUndo);
-  };
-
-  const handleRedo = () => {
-    let newUndo = [...undo];
-    let newRedo = [...redo];
-
-    if (newRedo.length > 0) {
-      newUndo.pop();
-      newUndo.push(newRedo.pop());
-      newUndo.push([]);
-      setUndo(newUndo);
-      setRedo(newRedo);
-    }
   };
 
   return (
