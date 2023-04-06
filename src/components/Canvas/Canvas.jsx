@@ -1,14 +1,15 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import "./Canvas.css";
 
 function Canvas() {
-  const defaultSize = [1, 5, 10, 25, 50, 100];
-  const canvasRef = useRef(null);
+  const defaultSize = [1, 3, 5, 10, 25, 50];
   const whiteboardRef = useRef(null);
   const [mouseData, setMouseData] = useState({ x: 0, y: 0 });
-  const [canvasCTX, setCanvasCTX] = useState(null);
-  const [color, setColor] = useState("#000000");
-  const [size, setSize] = useState(defaultSize[3]);
+  const [currentStroke, setCurrentStroke] = useState({
+    color: "#000000",
+    size: defaultSize[2],
+    points: [],
+  });
 
   const [keys, setKeys] = useState({
     ctrl: false,
@@ -16,33 +17,29 @@ function Canvas() {
     y: false,
   });
 
-  const [undo, setUndo] = useState([[]]);
+  const [undo, setUndo] = useState([]);
   const [redo, setRedo] = useState([]);
 
-  const width = 1024;
-  const height = 768;
+  const [width, height] = useMemo(() => [1024, 768], []);
+  const canvasRef = useRef(null);
+  const [canvasCTX, setCanvasCTX] = useState(null);
 
   const handleUndo = useCallback(() => {
     let newUndo = [...undo];
-    newUndo.pop();
     if (newUndo.length > 0) {
       let stroke = newUndo.pop();
       let newRedo = [...redo];
       newRedo.push(stroke);
       setRedo(newRedo);
+      setUndo(newUndo);
     }
-    newUndo.push([]);
-    setUndo(newUndo);
   }, [undo, redo]);
 
   const handleRedo = useCallback(() => {
     let newUndo = [...undo];
     let newRedo = [...redo];
-
     if (newRedo.length > 0) {
-      newUndo.pop();
       newUndo.push(newRedo.pop());
-      newUndo.push([]);
       setUndo(newUndo);
       setRedo(newRedo);
     }
@@ -50,17 +47,50 @@ function Canvas() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d", { alpha: false });
+    const ctx = canvas.getContext("2d");
     const dpr = window.devicePixelRatio;
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     ctx.scale(dpr, dpr);
     setCanvasCTX(ctx);
-  }, [canvasRef]);
+  }, [canvasRef, width, height]);
+
+  useEffect(() => {
+    let animationFrameId;
+    const ctx = canvasCTX;
+
+    function updateCanvas() {
+      if (ctx) {
+        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        for (const stroke of [...undo, currentStroke]) {
+          if (stroke.points.length > 0) {
+            ctx.beginPath();
+            for (const point of stroke.points) {
+              ctx.moveTo(point.x_start, point.y_start);
+              ctx.lineTo(point.x_end, point.y_end);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = stroke.color;
+            ctx.lineWidth = stroke.size;
+            ctx.lineCap = "round";
+            ctx.stroke();
+          }
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(updateCanvas);
+    }
+
+    animationFrameId = requestAnimationFrame(updateCanvas);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [undo, currentStroke, canvasCTX]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      const newKeys = JSON.parse(JSON.stringify(keys));
+      const newKeys = keys;
       const { key } = event;
       if (key === "Control") newKeys.ctrl = true;
       if (key === "z") newKeys.z = true;
@@ -73,7 +103,7 @@ function Canvas() {
     };
 
     const handleKeyUp = (event) => {
-      const newKeys = JSON.parse(JSON.stringify(keys));
+      const newKeys = keys;
       const { key } = event;
       if (key === "Control") newKeys.ctrl = false;
       if (key === "z") newKeys.z = false;
@@ -91,23 +121,6 @@ function Canvas() {
     };
   }, [keys, handleUndo, handleRedo]);
 
-  useEffect(() => {
-    const ctx = canvasCTX;
-    if (ctx)
-      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    for (const stroke of undo) {
-      for (const point of stroke) {
-        ctx.beginPath();
-        ctx.moveTo(point.x_start, point.y_start);
-        ctx.lineTo(point.x_end, point.y_end);
-        ctx.strokeStyle = point.color;
-        ctx.lineWidth = point.size;
-        ctx.lineCap = "round";
-        ctx.stroke();
-      }
-    }
-  }, [undo, canvasCTX]);
-
   const setPos = (event) => {
     const localX = Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
     const localY = Math.floor(event.clientY - whiteboardRef.current.offsetTop);
@@ -119,7 +132,7 @@ function Canvas() {
 
   const draw = (event) => {
     if (event.buttons !== 1) return;
-    let newUndo = [...undo];
+    let newCurrentStroke = currentStroke;
     const localX = Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
     const localY = Math.floor(event.clientY - whiteboardRef.current.offsetTop);
 
@@ -128,42 +141,42 @@ function Canvas() {
       y_start: mouseData.y,
       x_end: localX,
       y_end: localY,
-      color: color,
-      size: size,
     };
 
-    newUndo[newUndo.length - 1].push(point);
-    setUndo(newUndo);
+    newCurrentStroke.points.push(point);
+    setCurrentStroke(newCurrentStroke);
   };
 
   return (
     <div className="Canvas">
-      <div className="Whiteboard" ref={whiteboardRef}>
-        <canvas
-          ref={canvasRef}
-          onMouseEnter={(event) => setPos(event)}
-          onMouseMove={(event) => {
-            event.preventDefault();
-            setPos(event);
-            draw(event);
-          }}
-          onMouseDown={(event) => {
-            event.preventDefault();
-            setRedo([]);
-            setPos(event);
-            draw(event);
-          }}
-          onMouseUp={() => {
-            setUndo([...undo, []]);
-          }}
-        />
+      <div
+        className="Whiteboard"
+        ref={whiteboardRef}
+        onMouseEnter={(event) => setPos(event)}
+        onMouseMove={(event) => {
+          event.preventDefault();
+          setPos(event);
+          draw(event);
+        }}
+        onMouseDown={(event) => {
+          event.preventDefault();
+          setRedo([]);
+          setPos(event);
+          draw(event);
+        }}
+        onMouseUp={() => {
+          setUndo([...undo, currentStroke]);
+          setCurrentStroke({ ...currentStroke, points: [] });
+        }}
+      >
+        <canvas className="Minicanvas" ref={canvasRef} />
         <div
           className="Paintbrush"
           style={{
             left: `${mouseData.x}px`,
             top: `${mouseData.y}px`,
-            width: `${size}px`,
-            height: `${size}px`,
+            width: `${currentStroke.size}px`,
+            height: `${currentStroke.size}px`,
           }}
         />
       </div>
@@ -173,22 +186,28 @@ function Canvas() {
           <input
             className="Number"
             type="number"
-            value={size}
-            max={100}
+            value={currentStroke.size}
+            max={50}
             min={1}
             onChange={(event) => {
-              setSize(event.target.value);
+              setCurrentStroke({
+                ...currentStroke,
+                size: event.target.value > 50 ? 50 : event.target.value,
+              });
             }}
           />
           <input
             className="Range"
             type="range"
-            value={size}
-            max={100}
+            value={currentStroke.size}
+            max={50}
             min={1}
             step={1}
             onChange={(event) => {
-              setSize(event.target.value);
+              setCurrentStroke({
+                ...currentStroke,
+                size: event.target.value > 50 ? 50 : event.target.value,
+              });
             }}
           />
         </div>
@@ -199,7 +218,7 @@ function Canvas() {
                 className="DefaultSizes"
                 key={size}
                 onClick={() => {
-                  setSize(size);
+                  setCurrentStroke({ ...currentStroke, size: size });
                 }}
               >
                 <div style={{ width: size, height: size }} />
@@ -211,9 +230,9 @@ function Canvas() {
         <input
           className="Color"
           type="color"
-          value={color}
+          value={currentStroke.color}
           onChange={(event) => {
-            setColor(event.target.value);
+            setCurrentStroke({ ...currentStroke, color: event.target.value });
           }}
         />
         <div className="History">
@@ -235,16 +254,11 @@ function Canvas() {
         <button
           className="Clear"
           onClick={() => {
-            const response = window.confirm("Clear canvas?\n\nCannot undo!");
+            const response = window.confirm(
+              "This action cannot be undone, clear canvas?"
+            );
             if (response) {
-              const ctx = canvasCTX;
-              ctx.clearRect(
-                0,
-                0,
-                canvasRef.current.width,
-                canvasRef.current.height
-              );
-              setUndo([[]]);
+              setUndo([]);
               setRedo([]);
             }
           }}
