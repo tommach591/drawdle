@@ -5,11 +5,9 @@ function Canvas() {
   const defaultSize = [1, 3, 5, 10, 25, 50];
   const whiteboardRef = useRef(null);
   const [mouseData, setMouseData] = useState({ x: 0, y: 0 });
-  const [currentStroke, setCurrentStroke] = useState({
-    color: "#000000",
-    size: defaultSize[2],
-    points: [],
-  });
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [color, setColor] = useState("#000000");
+  const [size, setSize] = useState(defaultSize[2]);
 
   const [keys, setKeys] = useState({
     ctrl: false,
@@ -17,33 +15,96 @@ function Canvas() {
     y: false,
   });
 
-  const [undo, setUndo] = useState([]);
-  const [redo, setRedo] = useState([]);
+  const [strokeCount, setStrokeCount] = useState(0);
+  const [drawHistory, setDrawHistory] = useState([]);
+  const [redoHistory, setRedoHistory] = useState([]);
 
   const [width, height] = useMemo(() => [1024, 768], []);
   const canvasRef = useRef(null);
   const [canvasCTX, setCanvasCTX] = useState(null);
 
-  const handleUndo = useCallback(() => {
-    let newUndo = [...undo];
-    if (newUndo.length > 0) {
-      let stroke = newUndo.pop();
-      let newRedo = [...redo];
-      newRedo.push(stroke);
-      setRedo(newRedo);
-      setUndo(newUndo);
+  const startDrawing = (event) => {
+    const localX = Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
+    const localY = Math.floor(event.clientY - whiteboardRef.current.offsetTop);
+
+    setIsDrawing(true);
+    setRedoHistory([]);
+    setDrawHistory((prevHistory) => [
+      ...prevHistory,
+      { color: color, size: size, points: [{ x: localX, y: localY }] },
+    ]);
+    setStrokeCount((prevCount) => prevCount + 1);
+  };
+
+  const finishDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const draw = (event) => {
+    const localX = Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
+    const localY = Math.floor(event.clientY - whiteboardRef.current.offsetTop);
+    setMouseData({
+      x: localX,
+      y: localY,
+    });
+    if (!isDrawing) return;
+
+    setDrawHistory((prevHistory) => {
+      const lastStroke = prevHistory[prevHistory.length - 1];
+      lastStroke.points.push({ x: localX, y: localY });
+      return [...prevHistory.slice(0, -1), lastStroke];
+    });
+  };
+
+  const drawStroke = useCallback((ctx, stroke) => {
+    if (stroke && stroke.points.length > 0) {
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth = stroke.size;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+      ctx.beginPath();
+      ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+      for (let i = 1; i < stroke.points.length; i++) {
+        ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+        ctx.moveTo(stroke.points[i].x, stroke.points[i].y);
+      }
+      ctx.closePath();
+      ctx.stroke();
     }
-  }, [undo, redo]);
+  }, []);
+
+  const redrawCanvas = useCallback(() => {
+    const ctx = canvasCTX;
+    if (ctx) {
+      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      for (const stroke of drawHistory) {
+        drawStroke(ctx, stroke);
+      }
+      setStrokeCount(drawHistory.length);
+    }
+  }, [canvasCTX, drawHistory, drawStroke]);
+
+  const handleUndo = useCallback(() => {
+    if (drawHistory.length > 0) {
+      setRedoHistory((prevHistory) => [
+        ...prevHistory,
+        drawHistory[drawHistory.length - 1],
+      ]);
+      setDrawHistory((prevHistory) => prevHistory.slice(0, -1));
+    }
+  }, [drawHistory]);
 
   const handleRedo = useCallback(() => {
-    let newUndo = [...undo];
-    let newRedo = [...redo];
-    if (newRedo.length > 0) {
-      newUndo.push(newRedo.pop());
-      setUndo(newUndo);
-      setRedo(newRedo);
+    if (redoHistory.length > 0) {
+      setStrokeCount((prevCount) => prevCount + 1);
+      setDrawHistory((prevHistory) => [
+        ...prevHistory,
+        redoHistory[redoHistory.length - 1],
+      ]);
+      setRedoHistory((prevHistory) => prevHistory.slice(0, -1));
     }
-  }, [undo, redo]);
+  }, [redoHistory]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -58,35 +119,19 @@ function Canvas() {
   useEffect(() => {
     let animationFrameId;
     const ctx = canvasCTX;
-
-    function updateCanvas() {
-      if (ctx) {
-        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-        for (const stroke of [...undo, currentStroke]) {
-          if (stroke.points.length > 0) {
-            ctx.beginPath();
-            for (const point of stroke.points) {
-              ctx.moveTo(point.x_start, point.y_start);
-              ctx.lineTo(point.x_end, point.y_end);
-            }
-            ctx.closePath();
-            ctx.strokeStyle = stroke.color;
-            ctx.lineWidth = stroke.size;
-            ctx.lineCap = "round";
-            ctx.stroke();
-          }
-        }
-      }
-
-      animationFrameId = requestAnimationFrame(updateCanvas);
+    if (strokeCount !== drawHistory.length) {
+      animationFrameId = requestAnimationFrame(redrawCanvas);
+    } else {
+      const stroke = drawHistory[drawHistory.length - 1];
+      animationFrameId = requestAnimationFrame(() => {
+        drawStroke(ctx, stroke);
+      });
     }
-
-    animationFrameId = requestAnimationFrame(updateCanvas);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [undo, currentStroke, canvasCTX]);
+  }, [canvasCTX, drawHistory, strokeCount, drawStroke, redrawCanvas]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -121,52 +166,26 @@ function Canvas() {
     };
   }, [keys, handleUndo, handleRedo]);
 
-  const setPos = (event) => {
-    const localX = Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
-    const localY = Math.floor(event.clientY - whiteboardRef.current.offsetTop);
-    setMouseData({
-      x: localX,
-      y: localY,
-    });
-  };
-
-  const draw = (event) => {
-    if (event.buttons !== 1) return;
-    let newCurrentStroke = currentStroke;
-    const localX = Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
-    const localY = Math.floor(event.clientY - whiteboardRef.current.offsetTop);
-
-    let point = {
-      x_start: mouseData.x,
-      y_start: mouseData.y,
-      x_end: localX,
-      y_end: localY,
-    };
-
-    newCurrentStroke.points.push(point);
-    setCurrentStroke(newCurrentStroke);
-  };
-
   return (
     <div className="Canvas">
       <div
         className="Whiteboard"
         ref={whiteboardRef}
-        onMouseEnter={(event) => setPos(event)}
         onMouseMove={(event) => {
           event.preventDefault();
-          setPos(event);
           draw(event);
         }}
         onMouseDown={(event) => {
           event.preventDefault();
-          setRedo([]);
-          setPos(event);
-          draw(event);
+          startDrawing(event);
         }}
-        onMouseUp={() => {
-          setUndo([...undo, currentStroke]);
-          setCurrentStroke({ ...currentStroke, points: [] });
+        onMouseUp={(event) => {
+          event.preventDefault();
+          finishDrawing();
+        }}
+        onMouseLeave={(event) => {
+          event.preventDefault();
+          finishDrawing();
         }}
       >
         <canvas className="Minicanvas" ref={canvasRef} />
@@ -175,8 +194,8 @@ function Canvas() {
           style={{
             left: `${mouseData.x}px`,
             top: `${mouseData.y}px`,
-            width: `${currentStroke.size}px`,
-            height: `${currentStroke.size}px`,
+            width: `${size}px`,
+            height: `${size}px`,
           }}
         />
       </div>
@@ -186,28 +205,22 @@ function Canvas() {
           <input
             className="Number"
             type="number"
-            value={currentStroke.size}
+            value={size}
             max={50}
             min={1}
             onChange={(event) => {
-              setCurrentStroke({
-                ...currentStroke,
-                size: event.target.value > 50 ? 50 : event.target.value,
-              });
+              setSize(event.target.value > 50 ? 50 : event.target.value);
             }}
           />
           <input
             className="Range"
             type="range"
-            value={currentStroke.size}
+            value={size}
             max={50}
             min={1}
             step={1}
             onChange={(event) => {
-              setCurrentStroke({
-                ...currentStroke,
-                size: event.target.value > 50 ? 50 : event.target.value,
-              });
+              setSize(event.target.value > 50 ? 50 : event.target.value);
             }}
           />
         </div>
@@ -218,7 +231,7 @@ function Canvas() {
                 className="DefaultSizes"
                 key={size}
                 onClick={() => {
-                  setCurrentStroke({ ...currentStroke, size: size });
+                  setSize(size);
                 }}
               >
                 <div style={{ width: size, height: size }} />
@@ -230,9 +243,9 @@ function Canvas() {
         <input
           className="Color"
           type="color"
-          value={currentStroke.color}
+          value={color}
           onChange={(event) => {
-            setCurrentStroke({ ...currentStroke, color: event.target.value });
+            setColor(event.target.value);
           }}
         />
         <div className="History">
@@ -258,8 +271,8 @@ function Canvas() {
               "This action cannot be undone, clear canvas?"
             );
             if (response) {
-              setUndo([]);
-              setRedo([]);
+              setDrawHistory([]);
+              setRedoHistory([]);
             }
           }}
         >
