@@ -1,24 +1,40 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import "./Canvas.css";
+import {
+  useBackground,
+  useColor,
+  useDrawHistory,
+  useDrawHistoryUpdate,
+  useHandleRedo,
+  useHandleUndo,
+  useRedoHistoryUpdate,
+  useSize,
+  useStrokeCount,
+  useStrokeCountUpdate,
+} from "../../utils/CanvasContext";
 
 function Canvas() {
-  const defaultSize = [1, 3, 5, 10, 25, 50];
+  const color = useColor();
+  const size = useSize();
+  const background = useBackground();
+  const drawHistory = useDrawHistory();
+  const setDrawHistory = useDrawHistoryUpdate();
+  const setRedoHistory = useRedoHistoryUpdate();
+  const strokeCount = useStrokeCount();
+  const setStrokeCount = useStrokeCountUpdate();
+  const handleUndo = useHandleUndo();
+  const handleRedo = useHandleRedo();
+
   const whiteboardRef = useRef(null);
   const [mouseData, setMouseData] = useState({ x: 0, y: 0 });
   const [isDrawing, setIsDrawing] = useState(false);
-  const [color, setColor] = useState("#000000");
-  const [background, setBackground] = useState("#FFFFFF");
-  const [size, setSize] = useState(defaultSize[2]);
+  const [showBrush, setShowBrush] = useState(false);
 
   const [keys, setKeys] = useState({
     ctrl: false,
     z: false,
     y: false,
   });
-
-  const [strokeCount, setStrokeCount] = useState(0);
-  const [drawHistory, setDrawHistory] = useState([]);
-  const [redoHistory, setRedoHistory] = useState([]);
 
   const [width, height] = useMemo(() => [1024, 768], []);
   const canvasRef = useRef(null);
@@ -86,28 +102,7 @@ function Canvas() {
       }
       setStrokeCount(drawHistory.length);
     }
-  }, [canvasCTX, drawHistory, drawStroke, background]);
-
-  const handleUndo = useCallback(() => {
-    if (drawHistory.length > 0) {
-      setRedoHistory((prevHistory) => [
-        ...prevHistory,
-        drawHistory[drawHistory.length - 1],
-      ]);
-      setDrawHistory((prevHistory) => prevHistory.slice(0, -1));
-    }
-  }, [drawHistory]);
-
-  const handleRedo = useCallback(() => {
-    if (redoHistory.length > 0) {
-      setStrokeCount((prevCount) => prevCount + 1);
-      setDrawHistory((prevHistory) => [
-        ...prevHistory,
-        redoHistory[redoHistory.length - 1],
-      ]);
-      setRedoHistory((prevHistory) => prevHistory.slice(0, -1));
-    }
-  }, [redoHistory]);
+  }, [canvasCTX, drawHistory, drawStroke, setStrokeCount, background]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -181,6 +176,10 @@ function Canvas() {
       <div
         className="Whiteboard"
         ref={whiteboardRef}
+        onMouseEnter={(event) => {
+          event.preventDefault();
+          setShowBrush(true);
+        }}
         onMouseMove={(event) => {
           event.preventDefault();
           draw(event);
@@ -195,110 +194,24 @@ function Canvas() {
         }}
         onMouseLeave={(event) => {
           event.preventDefault();
+          setShowBrush(false);
           finishDrawing();
         }}
       >
         <canvas className="Minicanvas" ref={canvasRef} />
         <div
           className="Paintbrush"
-          style={{
-            left: `${mouseData.x}px`,
-            top: `${mouseData.y}px`,
-            width: `${size}px`,
-            height: `${size}px`,
-          }}
+          style={
+            showBrush
+              ? {
+                  left: `${mouseData.x}px`,
+                  top: `${mouseData.y}px`,
+                  width: `${size}px`,
+                  height: `${size}px`,
+                }
+              : { display: "none" }
+          }
         />
-      </div>
-
-      <div className="Controls">
-        <div className="Size">
-          <input
-            className="Number"
-            type="number"
-            value={size}
-            max={50}
-            min={1}
-            onChange={(event) => {
-              setSize(event.target.value > 50 ? 50 : event.target.value);
-            }}
-          />
-          <input
-            className="Range"
-            type="range"
-            value={size}
-            max={50}
-            min={1}
-            step={1}
-            onChange={(event) => {
-              setSize(event.target.value > 50 ? 50 : event.target.value);
-            }}
-          />
-        </div>
-        <div className="SizeGrid">
-          {defaultSize.map((size) => {
-            return (
-              <div
-                className="DefaultSizes"
-                key={size}
-                onClick={() => {
-                  setSize(size);
-                }}
-              >
-                <div style={{ width: size, height: size }} />
-                <h1>{size}</h1>
-              </div>
-            );
-          })}
-        </div>
-        <h1>Color</h1>
-        <input
-          className="Color"
-          type="color"
-          value={color}
-          onChange={(event) => {
-            setColor(event.target.value);
-          }}
-        />
-        <h1>Background</h1>
-        <input
-          className="Color"
-          type="color"
-          value={background}
-          onChange={(event) => {
-            setBackground(event.target.value);
-          }}
-        />
-        <div className="History">
-          <button
-            onClick={() => {
-              handleUndo();
-            }}
-          >
-            Undo
-          </button>
-          <button
-            onClick={() => {
-              handleRedo();
-            }}
-          >
-            Redo
-          </button>
-        </div>
-        <button
-          className="Clear"
-          onClick={() => {
-            const response = window.confirm(
-              "This action cannot be undone, clear canvas?"
-            );
-            if (response) {
-              setDrawHistory([]);
-              setRedoHistory([]);
-            }
-          }}
-        >
-          Clear
-        </button>
-        <button>Submit</button>
       </div>
     </div>
   );
