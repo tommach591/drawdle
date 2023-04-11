@@ -7,6 +7,7 @@ function Canvas() {
   const [mouseData, setMouseData] = useState({ x: 0, y: 0 });
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState("#000000");
+  const [background, setBackground] = useState("#FFFFFF");
   const [size, setSize] = useState(defaultSize[2]);
 
   const [keys, setKeys] = useState({
@@ -78,12 +79,14 @@ function Canvas() {
     const ctx = canvasCTX;
     if (ctx) {
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      ctx.fillStyle = background;
+      ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       for (const stroke of drawHistory) {
         drawStroke(ctx, stroke);
       }
       setStrokeCount(drawHistory.length);
     }
-  }, [canvasCTX, drawHistory, drawStroke]);
+  }, [canvasCTX, drawHistory, drawStroke, background]);
 
   const handleUndo = useCallback(() => {
     if (drawHistory.length > 0) {
@@ -108,13 +111,13 @@ function Canvas() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: false });
     const dpr = window.devicePixelRatio;
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     ctx.scale(dpr, dpr);
     setCanvasCTX(ctx);
-  }, [canvasRef, width, height]);
+  }, [canvasRef, width, height, background]);
 
   useEffect(() => {
     let animationFrameId;
@@ -132,6 +135,13 @@ function Canvas() {
       cancelAnimationFrame(animationFrameId);
     };
   }, [canvasCTX, drawHistory, strokeCount, drawStroke, redrawCanvas]);
+
+  useEffect(() => {
+    let animationFrameId = requestAnimationFrame(redrawCanvas);
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [background, redrawCanvas]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -240,12 +250,22 @@ function Canvas() {
             );
           })}
         </div>
+        <h1>Color</h1>
         <input
           className="Color"
           type="color"
           value={color}
           onChange={(event) => {
             setColor(event.target.value);
+          }}
+        />
+        <h1>Background</h1>
+        <input
+          className="Color"
+          type="color"
+          value={background}
+          onChange={(event) => {
+            setBackground(event.target.value);
           }}
         />
         <div className="History">
