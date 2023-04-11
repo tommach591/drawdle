@@ -1,7 +1,7 @@
 import "./App.css";
-import Canvas from "../Canvas";
 import { Routes, Route } from "react-router-dom";
-import Header from "../Header/Header";
+import Header from "../Header";
+import Home from "../Home";
 
 function App() {
   return (
@@ -9,7 +9,7 @@ function App() {
       <Header />
       <h1>Prompt</h1>
       <Routes>
-        <Route path="/" element={<Canvas />} />
+        <Route path="/" element={<Home />} />
       </Routes>
     </div>
   );
