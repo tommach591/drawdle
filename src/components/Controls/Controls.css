@@ -1,0 +1,91 @@
+.Controls {
+  width: 10.5rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.Controls > * {
+  width: 100%;
+  margin: 0.25rem;
+}
+
+.Size {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Number {
+  width: 2rem;
+  text-align: center;
+  border: 1px solid black;
+  border-radius: 3px;
+
+  outline: none;
+}
+
+.Number::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.SizeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 5px;
+}
+
+.DefaultSizes {
+  width: 3rem;
+  height: 3rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.DefaultSizes:hover {
+  cursor: pointer;
+}
+
+.DefaultSizes > div {
+  max-width: 15px;
+  max-height: 15px;
+  background: black;
+  border-radius: 50%;
+}
+
+.DefaultSizes > h1 {
+  font-size: 12px;
+  position: absolute;
+  bottom: 0px;
+}
+
+.Color {
+  border: none;
+  background: none;
+
+  margin-top: 0rem;
+  padding: 0rem;
+}
+
+.History {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.History > * {
+  width: 5rem;
+  margin: auto;
+}
