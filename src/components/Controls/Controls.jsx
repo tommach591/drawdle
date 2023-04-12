@@ -1,13 +1,17 @@
 import {
   useBackground,
   useBackgroundUpdate,
+  useBrushTool,
+  useBucketTool,
   useColor,
   useColorUpdate,
+  useEraserTool,
   useHandleClear,
   useHandleRedo,
   useHandleUndo,
   useSize,
   useSizeUpdate,
+  useTool,
 } from "../../utils/CanvasContext";
 import "./Controls.css";
 
@@ -22,6 +26,11 @@ function Controls() {
   const handleUndo = useHandleUndo();
   const handleRedo = useHandleRedo();
   const handleClear = useHandleClear();
+  const tool = useTool();
+  const setBrush = useBrushTool();
+  const setEraser = useEraserTool();
+  const setBucket = useBucketTool();
+  const [BRUSH, ERASER, BUCKET] = [0, 1, 2];
 
   return (
     <div className="Controls">
@@ -82,6 +91,38 @@ function Controls() {
           setBackground(event.target.value);
         }}
       />
+      <div className="ToolGrid">
+        <div
+          className="Tool"
+          style={tool === BRUSH ? { background: "rgb(190, 190, 190)" } : {}}
+          onClick={() => {
+            setBrush();
+          }}
+        >
+          <img
+            src="https://api.iconify.design/material-symbols:brush-outline.svg"
+            alt=""
+          />
+        </div>
+        <div
+          className="Tool"
+          style={tool === ERASER ? { background: "rgb(190, 190, 190)" } : {}}
+          onClick={() => {
+            setEraser();
+          }}
+        >
+          <img src="https://api.iconify.design/mdi:eraser.svg" alt="" />
+        </div>
+        <div
+          className="Tool"
+          style={tool === BUCKET ? { background: "rgb(190, 190, 190)" } : {}}
+          onClick={() => {
+            setBucket();
+          }}
+        >
+          <img src="https://api.iconify.design/gg:color-bucket.svg" alt="" />
+        </div>
+      </div>
       <div className="History">
         <button
           onClick={() => {
