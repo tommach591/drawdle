@@ -36,7 +36,8 @@
 .SizeGrid {
   display: grid;
   grid-template-columns: repeat(3, auto);
-  gap: 5px;
+  justify-content: center;
+  gap: 8px;
 }
 
 .DefaultSizes {
@@ -88,4 +89,36 @@
 .History > * {
   width: 5rem;
   margin: auto;
+}
+
+.ToolGrid {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  justify-content: center;
+  gap: 8px;
+
+  margin-bottom: 0.5rem;
+}
+
+.Tool {
+  width: 3rem;
+  height: 3rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.Tool > img {
+  width: 45%;
+}
+
+.Tool:hover {
+  cursor: pointer;
 }

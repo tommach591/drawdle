@@ -11,6 +11,7 @@ import {
   useSize,
   useStrokeCount,
   useStrokeCountUpdate,
+  useTool,
 } from "../../utils/CanvasContext";
 
 function Canvas() {
@@ -24,6 +25,9 @@ function Canvas() {
   const setStrokeCount = useStrokeCountUpdate();
   const handleUndo = useHandleUndo();
   const handleRedo = useHandleRedo();
+  // eslint-disable-next-line no-unused-vars
+  const [BRUSH, ERASER, BUCKET] = [0, 1, 2];
+  const tool = useTool();
 
   const whiteboardRef = useRef(null);
   const [mouseData, setMouseData] = useState({ x: 0, y: 0 });
@@ -36,7 +40,7 @@ function Canvas() {
     y: false,
   });
 
-  const [width, height] = useMemo(() => [1024, 768], []);
+  const [width, height] = useMemo(() => [600, 800], []);
   const canvasRef = useRef(null);
   const [canvasCTX, setCanvasCTX] = useState(null);
 
@@ -48,7 +52,11 @@ function Canvas() {
     setRedoHistory([]);
     setDrawHistory((prevHistory) => [
       ...prevHistory,
-      { color: color, size: size, points: [{ x: localX, y: localY }] },
+      {
+        color: tool === BRUSH ? color : background,
+        size: size,
+        points: [{ x: localX, y: localY }],
+      },
     ]);
     setStrokeCount((prevCount) => prevCount + 1);
   };
@@ -94,7 +102,6 @@ function Canvas() {
   const redrawCanvas = useCallback(() => {
     const ctx = canvasCTX;
     if (ctx) {
-      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       ctx.fillStyle = background;
       ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       for (const stroke of drawHistory) {
@@ -102,7 +109,7 @@ function Canvas() {
       }
       setStrokeCount(drawHistory.length);
     }
-  }, [canvasCTX, drawHistory, drawStroke, setStrokeCount, background]);
+  }, [canvasCTX, drawHistory, drawStroke, background, setStrokeCount]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -111,6 +118,9 @@ function Canvas() {
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     setCanvasCTX(ctx);
   }, [canvasRef, width, height, background]);
 
@@ -136,7 +146,8 @@ function Canvas() {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [background, redrawCanvas]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [background]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -175,6 +186,7 @@ function Canvas() {
     <div className="Canvas">
       <div
         className="Whiteboard"
+        style={{ width: width, height: height }}
         ref={whiteboardRef}
         onMouseEnter={(event) => {
           event.preventDefault();
@@ -186,7 +198,7 @@ function Canvas() {
         }}
         onMouseDown={(event) => {
           event.preventDefault();
-          startDrawing(event);
+          if (tool !== BUCKET) startDrawing(event);
         }}
         onMouseUp={(event) => {
           event.preventDefault();

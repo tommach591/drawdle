@@ -3,9 +3,6 @@
 }
 
 .Whiteboard {
-  width: 1024px;
-  height: 768px;
-
   position: relative;
   overflow: hidden;
 
