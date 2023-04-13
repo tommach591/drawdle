@@ -2,6 +2,7 @@
   width: 10.5rem;
   display: flex;
   flex-direction: column;
+  align-items: center;
   position: relative;
 
   margin-left: 1rem;
@@ -72,7 +73,12 @@
   bottom: 0px;
 }
 
+.ColorGrid {
+  width: 100%;
+}
+
 .Color {
+  width: 50%;
   border: none;
   background: none;
 
@@ -121,4 +127,8 @@
 
 .Tool:hover {
   cursor: pointer;
+}
+
+.BigButton {
+  width: 98%;
 }

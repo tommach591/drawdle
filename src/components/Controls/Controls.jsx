@@ -1,10 +1,10 @@
 import {
-  useBackground,
-  useBackgroundUpdate,
+  useSecondary,
+  useSecondaryUpdate,
   useBrushTool,
   useBucketTool,
-  useColor,
-  useColorUpdate,
+  usePrimary,
+  usePrimaryUpdate,
   useEraserTool,
   useHandleClear,
   useHandleRedo,
@@ -17,12 +17,12 @@ import "./Controls.css";
 
 function Controls() {
   const defaultSize = [1, 3, 5, 10, 25, 50];
+  const primary = usePrimary();
+  const setPrimary = usePrimaryUpdate();
+  const secondary = useSecondary();
+  const setSecondary = useSecondaryUpdate();
   const size = useSize();
   const setSize = useSizeUpdate();
-  const color = useColor();
-  const setColor = useColorUpdate();
-  const background = useBackground();
-  const setBackground = useBackgroundUpdate();
   const handleUndo = useHandleUndo();
   const handleRedo = useHandleRedo();
   const handleClear = useHandleClear();
@@ -73,24 +73,24 @@ function Controls() {
           );
         })}
       </div>
-      <h1>Color</h1>
-      <input
-        className="Color"
-        type="color"
-        value={color}
-        onChange={(event) => {
-          setColor(event.target.value);
-        }}
-      />
-      <h1>Background</h1>
-      <input
-        className="Color"
-        type="color"
-        value={background}
-        onChange={(event) => {
-          setBackground(event.target.value);
-        }}
-      />
+      <div className="ColorGrid">
+        <input
+          className="Color"
+          type="color"
+          value={primary}
+          onChange={(event) => {
+            setPrimary(event.target.value);
+          }}
+        />
+        <input
+          className="Color"
+          type="color"
+          value={secondary}
+          onChange={(event) => {
+            setSecondary(event.target.value);
+          }}
+        />
+      </div>
       <div className="ToolGrid">
         <div
           className="Tool"
@@ -129,18 +129,18 @@ function Controls() {
             handleUndo();
           }}
         >
-          Undo
+          <img src="https://api.iconify.design/ic:round-undo.svg" alt="" />
         </button>
         <button
           onClick={() => {
             handleRedo();
           }}
         >
-          Redo
+          <img src="https://api.iconify.design/ic:round-redo.svg" alt="" />
         </button>
       </div>
       <button
-        className="Clear"
+        className="BigButton"
         onClick={() => {
           const response = window.confirm(
             "This action cannot be undone, clear canvas?"
@@ -152,7 +152,7 @@ function Controls() {
       >
         Clear
       </button>
-      <button>Submit</button>
+      <button className="BigButton">Submit</button>
     </div>
   );
 }

@@ -1,23 +1,23 @@
 import { useContext, createContext, useState, useCallback } from "react";
 
-const ColorContext = createContext();
-export function useColor() {
-  return useContext(ColorContext);
+const PrimaryContext = createContext();
+export function usePrimary() {
+  return useContext(PrimaryContext);
 }
 
-const ColorUpdateContext = createContext();
-export function useColorUpdate() {
-  return useContext(ColorUpdateContext);
+const PrimaryUpdateContext = createContext();
+export function usePrimaryUpdate() {
+  return useContext(PrimaryUpdateContext);
 }
 
-const BackgroundContext = createContext();
-export function useBackground() {
-  return useContext(BackgroundContext);
+const SecondaryContext = createContext();
+export function useSecondary() {
+  return useContext(SecondaryContext);
 }
 
-const BackgroundUpdateContext = createContext();
-export function useBackgroundUpdate() {
-  return useContext(BackgroundUpdateContext);
+const SecondaryUpdateContext = createContext();
+export function useSecondaryUpdate() {
+  return useContext(SecondaryUpdateContext);
 }
 
 const SizeContext = createContext();
@@ -95,8 +95,8 @@ export function useBucketTool() {
 }
 
 export function CanvasProvider({ children }) {
-  const [color, setColor] = useState("#000000");
-  const [background, setBackground] = useState("#FFFFFF");
+  const [primary, setPrimary] = useState("#000000");
+  const [secondary, setSecondary] = useState("#FFFFFF");
   const [size, setSize] = useState(5);
   const [drawHistory, setDrawHistory] = useState([]);
   const [redoHistory, setRedoHistory] = useState([]);
@@ -134,10 +134,10 @@ export function CanvasProvider({ children }) {
   const setBucket = useCallback(() => setTool(BUCKET), [BUCKET]);
 
   return (
-    <ColorContext.Provider value={color}>
-      <ColorUpdateContext.Provider value={setColor}>
-        <BackgroundContext.Provider value={background}>
-          <BackgroundUpdateContext.Provider value={setBackground}>
+    <PrimaryContext.Provider value={primary}>
+      <PrimaryUpdateContext.Provider value={setPrimary}>
+        <SecondaryContext.Provider value={secondary}>
+          <SecondaryUpdateContext.Provider value={setSecondary}>
             <SizeContext.Provider value={size}>
               <SizeUpdateContext.Provider value={setSize}>
                 <DrawHistoryContext.Provider value={drawHistory}>
@@ -177,9 +177,9 @@ export function CanvasProvider({ children }) {
                 </DrawHistoryContext.Provider>
               </SizeUpdateContext.Provider>
             </SizeContext.Provider>
-          </BackgroundUpdateContext.Provider>
-        </BackgroundContext.Provider>
-      </ColorUpdateContext.Provider>
-    </ColorContext.Provider>
+          </SecondaryUpdateContext.Provider>
+        </SecondaryContext.Provider>
+      </PrimaryUpdateContext.Provider>
+    </PrimaryContext.Provider>
   );
 }

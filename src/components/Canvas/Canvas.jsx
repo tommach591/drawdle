@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import "./Canvas.css";
 import {
-  useBackground,
-  useColor,
+  useSecondary,
+  usePrimary,
   useDrawHistory,
   useDrawHistoryUpdate,
   useHandleRedo,
@@ -15,9 +15,9 @@ import {
 } from "../../utils/CanvasContext";
 
 function Canvas() {
-  const color = useColor();
+  const primary = usePrimary();
+  const secondary = useSecondary();
   const size = useSize();
-  const background = useBackground();
   const drawHistory = useDrawHistory();
   const setDrawHistory = useDrawHistoryUpdate();
   const setRedoHistory = useRedoHistoryUpdate();
@@ -53,7 +53,7 @@ function Canvas() {
     setDrawHistory((prevHistory) => [
       ...prevHistory,
       {
-        color: tool === BRUSH ? color : background,
+        color: tool === BRUSH ? primary : secondary,
         size: size,
         points: [{ x: localX, y: localY }],
       },
@@ -102,14 +102,15 @@ function Canvas() {
   const redrawCanvas = useCallback(() => {
     const ctx = canvasCTX;
     if (ctx) {
-      ctx.fillStyle = background;
+      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       for (const stroke of drawHistory) {
         drawStroke(ctx, stroke);
       }
       setStrokeCount(drawHistory.length);
     }
-  }, [canvasCTX, drawHistory, drawStroke, background, setStrokeCount]);
+  }, [canvasCTX, drawHistory, drawStroke, setStrokeCount]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -119,10 +120,10 @@ function Canvas() {
     canvas.height = height * dpr;
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    ctx.fillStyle = background;
+    ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     setCanvasCTX(ctx);
-  }, [canvasRef, width, height, background]);
+  }, [canvasRef, width, height]);
 
   useEffect(() => {
     let animationFrameId;
@@ -140,14 +141,6 @@ function Canvas() {
       cancelAnimationFrame(animationFrameId);
     };
   }, [canvasCTX, drawHistory, strokeCount, drawStroke, redrawCanvas]);
-
-  useEffect(() => {
-    let animationFrameId = requestAnimationFrame(redrawCanvas);
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [background]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
