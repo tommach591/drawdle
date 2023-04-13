@@ -5,6 +5,7 @@
   align-items: center;
   position: relative;
 
+  margin-top: 1rem;
   margin-left: 1rem;
   margin-right: 1rem;
 }
@@ -15,6 +16,7 @@
 }
 
 .Size {
+  width: 95%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -79,10 +81,12 @@
 
 .ColorGrid {
   width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .Color {
-  width: 50%;
+  width: 48.5%;
   border: none;
   background: none;
 
@@ -105,7 +109,7 @@
   display: grid;
   grid-template-columns: repeat(3, auto);
   justify-content: center;
-  gap: 8px;
+  gap: 5px;
 
   margin-bottom: 0.5rem;
 }
@@ -134,5 +138,5 @@
 }
 
 .BigButton {
-  width: 98%;
+  width: 95%;
 }
