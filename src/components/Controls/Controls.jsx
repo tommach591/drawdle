@@ -16,7 +16,7 @@ import {
 import "./Controls.css";
 
 function Controls() {
-  const defaultSize = [1, 3, 5, 10, 15, 25];
+  const defaultSize = [3, 7, 15];
   const primary = usePrimary();
   const setPrimary = usePrimaryUpdate();
   const secondary = useSecondary();
@@ -34,6 +34,38 @@ function Controls() {
 
   return (
     <div className="Controls">
+      <div className="History">
+        <button
+          onClick={() => {
+            handleUndo();
+          }}
+        >
+          <img src="https://api.iconify.design/ic:round-undo.svg" alt="" />
+        </button>
+        <button
+          onClick={() => {
+            handleRedo();
+          }}
+        >
+          <img src="https://api.iconify.design/ic:round-redo.svg" alt="" />
+        </button>
+      </div>
+      <div className="SizeGrid">
+        {defaultSize.map((size) => {
+          return (
+            <div
+              className="DefaultSizes"
+              key={size}
+              onClick={() => {
+                setSize(size);
+              }}
+            >
+              <div style={{ width: size, height: size }} />
+              <h1>{size}</h1>
+            </div>
+          );
+        })}
+      </div>
       <div className="Size">
         <input
           className="Number"
@@ -60,22 +92,6 @@ function Controls() {
             );
           }}
         />
-      </div>
-      <div className="SizeGrid">
-        {defaultSize.map((size) => {
-          return (
-            <div
-              className="DefaultSizes"
-              key={size}
-              onClick={() => {
-                setSize(size);
-              }}
-            >
-              <div style={{ width: size, height: size }} />
-              <h1>{size}</h1>
-            </div>
-          );
-        })}
       </div>
       <div className="ColorGrid">
         <input
@@ -126,22 +142,6 @@ function Controls() {
         >
           <img src="https://api.iconify.design/gg:color-bucket.svg" alt="" />
         </div>
-      </div>
-      <div className="History">
-        <button
-          onClick={() => {
-            handleUndo();
-          }}
-        >
-          <img src="https://api.iconify.design/ic:round-undo.svg" alt="" />
-        </button>
-        <button
-          onClick={() => {
-            handleRedo();
-          }}
-        >
-          <img src="https://api.iconify.design/ic:round-redo.svg" alt="" />
-        </button>
       </div>
       <button
         className="BigButton"

@@ -1,5 +1,5 @@
 .Controls {
-  width: 10.5rem;
+  width: 9rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,7 +21,7 @@
 }
 
 .Number {
-  width: 2rem;
+  width: 20%;
   text-align: center;
   border: 1px solid black;
   border-radius: 3px;
@@ -34,16 +34,20 @@
   margin: 0;
 }
 
+.Range {
+  width: 80%;
+}
+
 .SizeGrid {
   display: grid;
   grid-template-columns: repeat(3, auto);
   justify-content: center;
-  gap: 8px;
+  gap: 5px;
 }
 
 .DefaultSizes {
-  width: 3rem;
-  height: 3rem;
+  width: 2.5rem;
+  height: 2.5rem;
 
   display: flex;
   flex-direction: column;
@@ -61,8 +65,8 @@
 }
 
 .DefaultSizes > div {
-  max-width: 15px;
-  max-height: 15px;
+  max-width: 10px;
+  max-height: 10px;
   background: black;
   border-radius: 50%;
 }
@@ -89,11 +93,11 @@
 .History {
   width: 100%;
   display: flex;
-  align-items: center;
+  justify-content: center;
 }
 
 .History > * {
-  width: 5rem;
+  width: 45%;
   margin: auto;
 }
 
@@ -107,8 +111,8 @@
 }
 
 .Tool {
-  width: 3rem;
-  height: 3rem;
+  width: 2.5rem;
+  height: 2.5rem;
 
   display: flex;
   flex-direction: column;

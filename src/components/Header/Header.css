@@ -1,14 +1,14 @@
 .Header {
   width: 100vw;
-  height: 3rem;
+  height: 2.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
 
   border-bottom: 1px solid black;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .Header > h1 {
-  font-size: 32px;
+  font-size: 22px;
 }
