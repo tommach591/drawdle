@@ -97,7 +97,7 @@ export function useRedrawUpdate() {
 export function CanvasProvider({ children }) {
   const [primary, setPrimary] = useState("#000000");
   const [secondary, setSecondary] = useState("#FFFFFF");
-  const [size, setSize] = useState(5);
+  const [size, setSize] = useState(3);
   const [drawHistory, setDrawHistory] = useState([]);
   const [redoHistory, setRedoHistory] = useState([]);
   const [BRUSH, ERASER, BUCKET] = [0, 1, 2];

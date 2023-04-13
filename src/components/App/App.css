@@ -5,6 +5,6 @@
 }
 
 .App > h1 {
-  margin: 1rem;
-  font-size: 24px;
+  margin-bottom: 0.5rem;
+  font-size: 20px;
 }

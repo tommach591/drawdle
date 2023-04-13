@@ -13,6 +13,7 @@ import {
   useSize,
   useTool,
 } from "../../utils/CanvasContext";
+import { useMobile } from "../../utils/useMobile";
 
 function Canvas() {
   const primary = usePrimary();
@@ -25,10 +26,11 @@ function Canvas() {
   const handleRedo = useHandleRedo();
   const redraw = useRedraw();
   const setRedraw = useRedrawUpdate();
+  const tool = useTool();
   // eslint-disable-next-line no-unused-vars
   const [BRUSH, ERASER, BUCKET] = [0, 1, 2];
-  const tool = useTool();
 
+  const isMobile = useMobile();
   const whiteboardRef = useRef(null);
   const [mouseData, setMouseData] = useState({ x: 0, y: 0 });
   const [isDrawing, setIsDrawing] = useState(false);
@@ -40,13 +42,21 @@ function Canvas() {
     y: false,
   });
 
-  const [width, height] = useMemo(() => [300, 500], []);
+  const [width, height] = useMemo(() => [300, 300], []);
   const canvasRef = useRef(null);
   const [canvasCTX, setCanvasCTX] = useState(null);
 
   const startDrawing = (event) => {
-    const localX = Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
-    const localY = Math.floor(event.clientY - whiteboardRef.current.offsetTop);
+    const localX = isMobile
+      ? Math.floor(event.touches[0].clientX - whiteboardRef.current.offsetLeft)
+      : Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
+    const localY = isMobile
+      ? Math.floor(event.touches[0].clientY - whiteboardRef.current.offsetTop)
+      : Math.floor(event.clientY - whiteboardRef.current.offsetTop);
+    setMouseData({
+      x: localX,
+      y: localY,
+    });
 
     setIsDrawing(true);
     setRedoHistory([]);
@@ -66,14 +76,18 @@ function Canvas() {
   };
 
   const draw = (event) => {
-    const localX = Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
-    const localY = Math.floor(event.clientY - whiteboardRef.current.offsetTop);
+    const localX = isMobile
+      ? Math.floor(event.touches[0].clientX - whiteboardRef.current.offsetLeft)
+      : Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
+    const localY = isMobile
+      ? Math.floor(event.touches[0].clientY - whiteboardRef.current.offsetTop)
+      : Math.floor(event.clientY - whiteboardRef.current.offsetTop);
     setMouseData({
       x: localX,
       y: localY,
     });
-    if (!isDrawing) return;
 
+    if (!isDrawing) return;
     setDrawHistory((prevHistory) => {
       const lastStroke = prevHistory[prevHistory.length - 1];
       lastStroke.points.push({ x: localX, y: localY });
@@ -114,13 +128,17 @@ function Canvas() {
 
   const floodFill = (event) => {
     const ctx = canvasCTX;
-    const localX = Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
-    const localY = Math.floor(event.clientY - whiteboardRef.current.offsetTop);
-    const scale = 3;
+    const localX = isMobile
+      ? Math.floor(event.touches[0].clientX - whiteboardRef.current.offsetLeft)
+      : Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
+    const localY = isMobile
+      ? Math.floor(event.touches[0].clientY - whiteboardRef.current.offsetTop)
+      : Math.floor(event.clientY - whiteboardRef.current.offsetTop);
+    const scale = 2.5;
 
     const nextStroke = {
       color: primary,
-      size: scale * 2,
+      size: scale * 1.5,
       tool: tool,
       points: [],
     };
@@ -185,10 +203,8 @@ function Canvas() {
       alpha: false,
       willReadFrequently: true,
     });
-    const dpr = window.devicePixelRatio;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    ctx.scale(dpr, dpr);
+    canvas.width = width;
+    canvas.height = height;
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
@@ -252,26 +268,52 @@ function Canvas() {
         style={{ width: width, height: height }}
         ref={whiteboardRef}
         onMouseEnter={(event) => {
-          event.preventDefault();
-          setShowBrush(true);
-        }}
-        onMouseMove={(event) => {
-          event.preventDefault();
-          draw(event);
+          if (!isMobile) {
+            event.preventDefault();
+            setShowBrush(true);
+          }
         }}
         onMouseDown={(event) => {
-          event.preventDefault();
-          if (tool !== BUCKET) startDrawing(event);
-          else floodFill(event);
+          if (!isMobile) {
+            event.preventDefault();
+            if (tool !== BUCKET) startDrawing(event);
+            else floodFill(event);
+          }
+        }}
+        onMouseMove={(event) => {
+          if (!isMobile) {
+            event.preventDefault();
+            draw(event);
+          }
         }}
         onMouseUp={(event) => {
-          event.preventDefault();
-          finishDrawing();
+          if (!isMobile) {
+            event.preventDefault();
+            finishDrawing();
+          }
         }}
         onMouseLeave={(event) => {
-          event.preventDefault();
-          setShowBrush(false);
-          finishDrawing();
+          if (!isMobile) {
+            event.preventDefault();
+            setShowBrush(false);
+            finishDrawing();
+          }
+        }}
+        onTouchStart={(event) => {
+          if (isMobile) {
+            setShowBrush(true);
+            if (tool !== BUCKET) startDrawing(event);
+            else floodFill(event);
+          }
+        }}
+        onTouchMove={(event) => {
+          if (isMobile) draw(event);
+        }}
+        onTouchEnd={(event) => {
+          if (isMobile) {
+            finishDrawing();
+            setShowBrush(false);
+          }
         }}
       >
         <canvas className="Minicanvas" ref={canvasRef} />
