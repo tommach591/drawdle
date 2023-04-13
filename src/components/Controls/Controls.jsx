@@ -16,7 +16,7 @@ import {
 import "./Controls.css";
 
 function Controls() {
-  const defaultSize = [1, 3, 5, 10, 25, 50];
+  const defaultSize = [1, 3, 5, 10, 15, 25];
   const primary = usePrimary();
   const setPrimary = usePrimaryUpdate();
   const secondary = useSecondary();
@@ -39,8 +39,8 @@ function Controls() {
           className="Number"
           type="number"
           value={size}
-          max={50}
-          min={1}
+          max={defaultSize[defaultSize.length - 1]}
+          min={defaultSize[0]}
           onChange={(event) => {
             setSize(event.target.value > 50 ? 50 : event.target.value);
           }}
@@ -49,11 +49,15 @@ function Controls() {
           className="Range"
           type="range"
           value={size}
-          max={50}
-          min={1}
+          max={defaultSize[defaultSize.length - 1]}
+          min={defaultSize[0]}
           step={1}
           onChange={(event) => {
-            setSize(event.target.value > 50 ? 50 : event.target.value);
+            setSize(
+              event.target.value > defaultSize[defaultSize.length - 1]
+                ? defaultSize[defaultSize.length - 1]
+                : event.target.value
+            );
           }}
         />
       </div>

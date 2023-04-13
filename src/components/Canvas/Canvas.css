@@ -25,3 +25,14 @@
   z-index: 1;
   pointer-events: none;
 }
+
+.Bucket {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: transparent;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  font-size: 32px;
+}

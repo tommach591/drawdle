@@ -49,16 +49,6 @@ export function useRedoHistoryUpdate() {
   return useContext(RedoHistoryUpdateContext);
 }
 
-const StrokeCountContext = createContext();
-export function useStrokeCount() {
-  return useContext(StrokeCountContext);
-}
-
-const StrokeCountUpdateContext = createContext();
-export function useStrokeCountUpdate() {
-  return useContext(StrokeCountUpdateContext);
-}
-
 const HandleUndoContext = createContext();
 export function useHandleUndo() {
   return useContext(HandleUndoContext);
@@ -94,15 +84,25 @@ export function useBucketTool() {
   return useContext(BucketToolContext);
 }
 
+const RedrawContext = createContext();
+export function useRedraw() {
+  return useContext(RedrawContext);
+}
+
+const RedrawUpdateContext = createContext();
+export function useRedrawUpdate() {
+  return useContext(RedrawUpdateContext);
+}
+
 export function CanvasProvider({ children }) {
   const [primary, setPrimary] = useState("#000000");
   const [secondary, setSecondary] = useState("#FFFFFF");
   const [size, setSize] = useState(5);
   const [drawHistory, setDrawHistory] = useState([]);
   const [redoHistory, setRedoHistory] = useState([]);
-  const [strokeCount, setStrokeCount] = useState(0);
   const [BRUSH, ERASER, BUCKET] = [0, 1, 2];
   const [tool, setTool] = useState(BRUSH);
+  const [redraw, setRedraw] = useState(false);
 
   const handleUndo = useCallback(() => {
     if (drawHistory.length > 0) {
@@ -110,12 +110,12 @@ export function CanvasProvider({ children }) {
         return [...prevHistory, drawHistory[drawHistory.length - 1]];
       });
       setDrawHistory((prevHistory) => prevHistory.slice(0, -1));
+      setRedraw(true);
     }
   }, [drawHistory]);
 
   const handleRedo = useCallback(() => {
     if (redoHistory.length > 0) {
-      setStrokeCount((prevCount) => prevCount + 1);
       setDrawHistory((prevHistory) => [
         ...prevHistory,
         redoHistory[redoHistory.length - 1],
@@ -127,6 +127,7 @@ export function CanvasProvider({ children }) {
   const handleClear = useCallback(() => {
     setDrawHistory([]);
     setRedoHistory([]);
+    setRedraw(true);
   }, []);
 
   const setBrush = useCallback(() => setTool(BRUSH), [BRUSH]);
@@ -144,33 +145,29 @@ export function CanvasProvider({ children }) {
                   <DrawHistoryUpdateContext.Provider value={setDrawHistory}>
                     <RedoHistoryContext.Provider value={redoHistory}>
                       <RedoHistoryUpdateContext.Provider value={setRedoHistory}>
-                        <StrokeCountContext.Provider value={strokeCount}>
-                          <StrokeCountUpdateContext.Provider
-                            value={setStrokeCount}
-                          >
-                            <HandleUndoContext.Provider value={handleUndo}>
-                              <HandleRedoContext.Provider value={handleRedo}>
-                                <HandleClearContext.Provider
-                                  value={handleClear}
-                                >
-                                  <ToolContext.Provider value={tool}>
-                                    <BrushToolContext.Provider value={setBrush}>
-                                      <EraserToolContext.Provider
-                                        value={setEraser}
-                                      >
-                                        <BucketToolContext.Provider
-                                          value={setBucket}
+                        <HandleUndoContext.Provider value={handleUndo}>
+                          <HandleRedoContext.Provider value={handleRedo}>
+                            <HandleClearContext.Provider value={handleClear}>
+                              <ToolContext.Provider value={tool}>
+                                <BrushToolContext.Provider value={setBrush}>
+                                  <EraserToolContext.Provider value={setEraser}>
+                                    <BucketToolContext.Provider
+                                      value={setBucket}
+                                    >
+                                      <RedrawContext.Provider value={redraw}>
+                                        <RedrawUpdateContext.Provider
+                                          value={setRedraw}
                                         >
                                           {children}
-                                        </BucketToolContext.Provider>
-                                      </EraserToolContext.Provider>
-                                    </BrushToolContext.Provider>
-                                  </ToolContext.Provider>
-                                </HandleClearContext.Provider>
-                              </HandleRedoContext.Provider>
-                            </HandleUndoContext.Provider>
-                          </StrokeCountUpdateContext.Provider>
-                        </StrokeCountContext.Provider>
+                                        </RedrawUpdateContext.Provider>
+                                      </RedrawContext.Provider>
+                                    </BucketToolContext.Provider>
+                                  </EraserToolContext.Provider>
+                                </BrushToolContext.Provider>
+                              </ToolContext.Provider>
+                            </HandleClearContext.Provider>
+                          </HandleRedoContext.Provider>
+                        </HandleUndoContext.Provider>
                       </RedoHistoryUpdateContext.Provider>
                     </RedoHistoryContext.Provider>
                   </DrawHistoryUpdateContext.Provider>

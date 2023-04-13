@@ -8,9 +8,9 @@ import {
   useHandleRedo,
   useHandleUndo,
   useRedoHistoryUpdate,
+  useRedraw,
+  useRedrawUpdate,
   useSize,
-  useStrokeCount,
-  useStrokeCountUpdate,
   useTool,
 } from "../../utils/CanvasContext";
 
@@ -21,10 +21,10 @@ function Canvas() {
   const drawHistory = useDrawHistory();
   const setDrawHistory = useDrawHistoryUpdate();
   const setRedoHistory = useRedoHistoryUpdate();
-  const strokeCount = useStrokeCount();
-  const setStrokeCount = useStrokeCountUpdate();
   const handleUndo = useHandleUndo();
   const handleRedo = useHandleRedo();
+  const redraw = useRedraw();
+  const setRedraw = useRedrawUpdate();
   // eslint-disable-next-line no-unused-vars
   const [BRUSH, ERASER, BUCKET] = [0, 1, 2];
   const tool = useTool();
@@ -40,7 +40,7 @@ function Canvas() {
     y: false,
   });
 
-  const [width, height] = useMemo(() => [600, 800], []);
+  const [width, height] = useMemo(() => [300, 500], []);
   const canvasRef = useRef(null);
   const [canvasCTX, setCanvasCTX] = useState(null);
 
@@ -55,10 +55,10 @@ function Canvas() {
       {
         color: tool === BRUSH ? primary : secondary,
         size: size,
+        tool: tool,
         points: [{ x: localX, y: localY }],
       },
     ]);
-    setStrokeCount((prevCount) => prevCount + 1);
   };
 
   const finishDrawing = () => {
@@ -81,23 +81,90 @@ function Canvas() {
     });
   };
 
-  const drawStroke = useCallback((ctx, stroke) => {
-    if (stroke && stroke.points.length > 0) {
-      ctx.strokeStyle = stroke.color;
-      ctx.lineWidth = stroke.size;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
+  const drawStroke = useCallback(
+    (ctx, stroke) => {
+      if (stroke && stroke.points.length > 0) {
+        ctx.strokeStyle = stroke.color;
+        ctx.lineWidth = stroke.size;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
 
-      ctx.beginPath();
-      ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-      for (let i = 1; i < stroke.points.length; i++) {
-        ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
-        ctx.moveTo(stroke.points[i].x, stroke.points[i].y);
+        if (stroke.tool !== BUCKET) {
+          ctx.beginPath();
+          ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+          for (let i = 1; i < stroke.points.length; i++) {
+            ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+            ctx.moveTo(stroke.points[i].x, stroke.points[i].y);
+          }
+          ctx.closePath();
+        } else {
+          ctx.beginPath();
+          for (let i = 0; i < stroke.points.length; i++) {
+            ctx.moveTo(stroke.points[i].x, stroke.points[i].y);
+            ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+          }
+          ctx.closePath();
+        }
+        ctx.closePath();
+        ctx.stroke();
       }
-      ctx.closePath();
-      ctx.stroke();
+    },
+    [BUCKET]
+  );
+
+  const floodFill = (event) => {
+    const ctx = canvasCTX;
+    const localX = Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
+    const localY = Math.floor(event.clientY - whiteboardRef.current.offsetTop);
+    const scale = 3;
+
+    const nextStroke = {
+      color: primary,
+      size: scale * 2,
+      tool: tool,
+      points: [],
+    };
+
+    const target = ctx.getImageData(localX, localY, 1, 1).data;
+    const queue = [[localX, localY]];
+    const visited = {};
+
+    while (queue.length) {
+      const [cx, cy] = queue.shift();
+      const current = ctx.getImageData(cx, cy, 1, 1).data;
+
+      if (
+        !visited[`${cx},${cy}`] &&
+        current[0] === target[0] &&
+        current[1] === target[1] &&
+        current[2] === target[2]
+      ) {
+        nextStroke.points.push({ x: cx, y: cy });
+        visited[`${cx},${cy}`] = true;
+
+        const left = cx - scale;
+        const right = cx + scale;
+        const up = cy - scale;
+        const down = cy + scale;
+
+        if (left >= 0 && !visited[`${left},${cy}`]) {
+          queue.push([left, cy]);
+        }
+        if (right < width && !visited[`${right},${cy}`]) {
+          queue.push([right, cy]);
+        }
+        if (up >= 0 && !visited[`${cx},${up}`]) {
+          queue.push([cx, up]);
+        }
+        if (down < height && !visited[`${cx},${down}`]) {
+          queue.push([cx, down]);
+        }
+      }
     }
-  }, []);
+
+    setRedoHistory([]);
+    setDrawHistory((prevHistory) => [...prevHistory, nextStroke]);
+  };
 
   const redrawCanvas = useCallback(() => {
     const ctx = canvasCTX;
@@ -108,13 +175,16 @@ function Canvas() {
       for (const stroke of drawHistory) {
         drawStroke(ctx, stroke);
       }
-      setStrokeCount(drawHistory.length);
+      setRedraw(false);
     }
-  }, [canvasCTX, drawHistory, drawStroke, setStrokeCount]);
+  }, [canvasCTX, drawHistory, setRedraw, drawStroke]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d", { alpha: false });
+    const ctx = canvas.getContext("2d", {
+      alpha: false,
+      willReadFrequently: true,
+    });
     const dpr = window.devicePixelRatio;
     canvas.width = width * dpr;
     canvas.height = height * dpr;
@@ -128,7 +198,7 @@ function Canvas() {
   useEffect(() => {
     let animationFrameId;
     const ctx = canvasCTX;
-    if (strokeCount !== drawHistory.length) {
+    if (redraw) {
       animationFrameId = requestAnimationFrame(redrawCanvas);
     } else {
       const stroke = drawHistory[drawHistory.length - 1];
@@ -140,7 +210,7 @@ function Canvas() {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [canvasCTX, drawHistory, strokeCount, drawStroke, redrawCanvas]);
+  }, [canvasCTX, drawHistory, redraw, drawStroke, redrawCanvas]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -192,6 +262,7 @@ function Canvas() {
         onMouseDown={(event) => {
           event.preventDefault();
           if (tool !== BUCKET) startDrawing(event);
+          else floodFill(event);
         }}
         onMouseUp={(event) => {
           event.preventDefault();
@@ -207,7 +278,7 @@ function Canvas() {
         <div
           className="Paintbrush"
           style={
-            showBrush
+            showBrush && tool !== BUCKET
               ? {
                   left: `${mouseData.x}px`,
                   top: `${mouseData.y}px`,
@@ -217,6 +288,19 @@ function Canvas() {
               : { display: "none" }
           }
         />
+        <div
+          className="Bucket"
+          style={
+            showBrush && tool === BUCKET
+              ? {
+                  left: `${mouseData.x}px`,
+                  top: `${mouseData.y}px`,
+                }
+              : { display: "none" }
+          }
+        >
+          +
+        </div>
       </div>
     </div>
   );
