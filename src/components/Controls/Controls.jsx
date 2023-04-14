@@ -16,7 +16,7 @@ import {
 import "./Controls.css";
 
 function Controls() {
-  const defaultSize = [3, 7, 15];
+  const defaultSize = [3, 5, 10];
   const primary = usePrimary();
   const setPrimary = usePrimaryUpdate();
   const secondary = useSecondary();
@@ -58,6 +58,7 @@ function Controls() {
               key={size}
               onClick={() => {
                 setSize(size);
+                if (tool === BUCKET) setBrush();
               }}
             >
               <div style={{ width: size, height: size }} />
@@ -74,7 +75,12 @@ function Controls() {
           max={defaultSize[defaultSize.length - 1]}
           min={defaultSize[0]}
           onChange={(event) => {
-            setSize(event.target.value > 50 ? 50 : event.target.value);
+            setSize(
+              event.target.value > defaultSize[defaultSize.length - 1]
+                ? defaultSize[defaultSize.length - 1]
+                : event.target.value
+            );
+            if (tool === BUCKET) setBrush();
           }}
         />
         <input
@@ -90,6 +96,7 @@ function Controls() {
                 ? defaultSize[defaultSize.length - 1]
                 : event.target.value
             );
+            if (tool === BUCKET) setBrush();
           }}
         />
       </div>

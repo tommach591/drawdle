@@ -5,7 +5,8 @@
 }
 
 .App > h1 {
+  height: 1rem;
   margin-bottom: 0.5rem;
-  font-size: 14px;
+  font-size: 16px;
   text-align: center;
 }
