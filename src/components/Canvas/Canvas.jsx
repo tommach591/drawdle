@@ -134,7 +134,7 @@ function Canvas() {
     const localY = isMobile
       ? Math.floor(event.touches[0].clientY - whiteboardRef.current.offsetTop)
       : Math.floor(event.clientY - whiteboardRef.current.offsetTop);
-    const scale = 2.5;
+    const scale = 3;
 
     const nextStroke = {
       color: primary,
@@ -149,7 +149,12 @@ function Canvas() {
     }
 
     function rgbToHex(r, g, b) {
-      return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+      return (
+        "#" +
+        componentToHex(r) +
+        componentToHex(g) +
+        componentToHex(b)
+      ).toUpperCase();
     }
 
     const targetRGB = ctx.getImageData(localX, localY, 1, 1).data;
