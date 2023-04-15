@@ -143,20 +143,28 @@ function Canvas() {
       points: [],
     };
 
-    const target = ctx.getImageData(localX, localY, 1, 1).data;
+    function componentToHex(c) {
+      var hex = c.toString(16);
+      return hex.length === 1 ? "0" + hex : hex;
+    }
+
+    function rgbToHex(r, g, b) {
+      return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+    }
+
+    const targetRGB = ctx.getImageData(localX, localY, 1, 1).data;
+    const target = rgbToHex(targetRGB[0], targetRGB[1], targetRGB[2]);
     const queue = [[localX, localY]];
     const visited = {};
 
+    if (target === primary) return;
+
     while (queue.length) {
       const [cx, cy] = queue.shift();
-      const current = ctx.getImageData(cx, cy, 1, 1).data;
+      const currentRGB = ctx.getImageData(cx, cy, 1, 1).data;
+      const current = rgbToHex(currentRGB[0], currentRGB[1], currentRGB[2]);
 
-      if (
-        !visited[`${cx},${cy}`] &&
-        current[0] === target[0] &&
-        current[1] === target[1] &&
-        current[2] === target[2]
-      ) {
+      if (!visited[`${cx},${cy}`] && current === target) {
         nextStroke.points.push({ x: cx, y: cy });
         visited[`${cx},${cy}`] = true;
 
@@ -333,7 +341,7 @@ function Canvas() {
         <div
           className="Bucket"
           style={
-            showBrush && tool === BUCKET
+            showBrush && tool === BUCKET && !isMobile
               ? {
                   left: `${mouseData.x}px`,
                   top: `${mouseData.y}px`,
