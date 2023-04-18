@@ -9,5 +9,4 @@ The daily doodle web app!
 
 ## API
 
-1. https://dictionaryapi.dev/
-2. https://random-word-api.vercel.app/
+1. https://random-word-api.vercel.app/
