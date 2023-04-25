@@ -4,9 +4,8 @@
   align-items: center;
 }
 
-.App > h1 {
+.Word {
   height: 1rem;
-  margin-bottom: 0.5rem;
   font-size: 16px;
   text-align: center;
 }

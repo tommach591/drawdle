@@ -1,4 +1,11 @@
-import { useContext, createContext, useState, useCallback } from "react";
+import {
+  useContext,
+  createContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
+import Categories from "../assets/categories.txt"; // Words from Quick, Draw!
 
 const PrimaryContext = createContext();
 export function usePrimary() {
@@ -94,6 +101,11 @@ export function useRedrawUpdate() {
   return useContext(RedrawUpdateContext);
 }
 
+const WordContext = createContext();
+export function useWord() {
+  return useContext(WordContext);
+}
+
 export function CanvasProvider({ children }) {
   const [primary, setPrimary] = useState("#000000");
   const [secondary, setSecondary] = useState("#FFFFFF");
@@ -103,6 +115,16 @@ export function CanvasProvider({ children }) {
   const [BRUSH, ERASER, BUCKET] = [0, 1, 2];
   const [tool, setTool] = useState(BRUSH);
   const [redraw, setRedraw] = useState(false);
+  const [word, setWord] = useState("");
+
+  useEffect(() => {
+    fetch(Categories)
+      .then((res) => res.text())
+      .then((text) => {
+        const list = text.split("\r\n");
+        setWord(list[Math.floor(Math.random() * list.length)].toUpperCase());
+      });
+  }, []);
 
   const handleUndo = useCallback(() => {
     if (drawHistory.length > 0) {
@@ -158,7 +180,9 @@ export function CanvasProvider({ children }) {
                                         <RedrawUpdateContext.Provider
                                           value={setRedraw}
                                         >
-                                          {children}
+                                          <WordContext.Provider value={word}>
+                                            {children}
+                                          </WordContext.Provider>
                                         </RedrawUpdateContext.Provider>
                                       </RedrawContext.Provider>
                                     </BucketToolContext.Provider>

@@ -12,7 +12,10 @@ import {
   useSize,
   useSizeUpdate,
   useTool,
+  useWord,
 } from "../../utils/CanvasContext";
+import { useMobile } from "../../utils/useMobile";
+import { usePortrait } from "../../utils/usePortrait";
 import "./Controls.css";
 
 function Controls() {
@@ -32,8 +35,21 @@ function Controls() {
   const setBucket = useBucketTool();
   const [BRUSH, ERASER, BUCKET] = [0, 1, 2];
 
+  const isMobile = useMobile();
+  const isPortrait = usePortrait();
+  const word = useWord();
+
   return (
     <div className="Controls">
+      {isMobile ? (
+        isPortrait ? (
+          <div />
+        ) : (
+          <h1 className="Word">{word}</h1>
+        )
+      ) : (
+        <div />
+      )}
       <div className="History">
         <button
           onClick={() => {

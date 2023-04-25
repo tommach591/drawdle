@@ -2,22 +2,27 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import Header from "../Header";
 import Home from "../Home";
-import { getWord } from "../../utils/Prompt";
-import { useEffect, useState } from "react";
+import { useMobile } from "../../utils/useMobile";
+import { usePortrait } from "../../utils/usePortrait";
+import { useWord } from "../../utils/CanvasContext";
 
 function App() {
-  const [word, setWord] = useState("");
-
-  useEffect(() => {
-    getWord().then((res) => {
-      setWord(res[0]);
-    });
-  }, []);
+  const isMobile = useMobile();
+  const isPortrait = usePortrait();
+  const word = useWord();
 
   return (
     <div className="App">
       <Header />
-      <h1>{word}</h1>
+      {isMobile ? (
+        isPortrait ? (
+          <h1 className="Word">{word}</h1>
+        ) : (
+          <div />
+        )
+      ) : (
+        <h1 className="Word">{word}</h1>
+      )}
       <Routes>
         <Route path="/" element={<Home />} />
       </Routes>
