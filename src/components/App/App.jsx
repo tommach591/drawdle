@@ -1,10 +1,11 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
-import Header from "../Header";
-import Home from "../Home";
 import { useMobile } from "../../utils/useMobile";
 import { usePortrait } from "../../utils/usePortrait";
 import { useWord } from "../../utils/CanvasContext";
+import Header from "../Header";
+import Home from "../Home";
+import Gallery from "../Gallery";
 
 function App() {
   const isMobile = useMobile();
@@ -25,6 +26,7 @@ function App() {
       )}
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/gallery" element={<Gallery />} />
       </Routes>
     </div>
   );
