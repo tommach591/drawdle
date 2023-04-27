@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import {
   useSecondary,
   useSecondaryUpdate,
@@ -38,6 +39,8 @@ function Controls() {
   const isMobile = useMobile();
   const isPortrait = usePortrait();
   const word = useWord();
+
+  const navigate = useNavigate();
 
   return (
     <div className="Controls">
@@ -179,7 +182,14 @@ function Controls() {
       >
         Clear
       </button>
-      <button className="BigButton">Submit</button>
+      <button
+        className="BigButton"
+        onClick={() => {
+          navigate(`/gallery`);
+        }}
+      >
+        Submit
+      </button>
     </div>
   );
 }
