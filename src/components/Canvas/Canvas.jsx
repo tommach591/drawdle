@@ -28,7 +28,7 @@ function Canvas() {
   const setRedraw = useRedrawUpdate();
   const tool = useTool();
   // eslint-disable-next-line no-unused-vars
-  const [BRUSH, ERASER, BUCKET] = [0, 1, 2];
+  const [BRUSH, ERASER] = [0, 1];
 
   const isMobile = useMobile();
   const whiteboardRef = useRef(null);
@@ -95,107 +95,23 @@ function Canvas() {
     });
   };
 
-  const drawStroke = useCallback(
-    (ctx, stroke) => {
-      if (stroke && stroke.points.length > 0) {
-        ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = stroke.size;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
+  const drawStroke = useCallback((ctx, stroke) => {
+    if (stroke && stroke.points.length > 0) {
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth = stroke.size;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
 
-        if (stroke.tool !== BUCKET) {
-          ctx.beginPath();
-          ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-          for (let i = 1; i < stroke.points.length; i++) {
-            ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
-            ctx.moveTo(stroke.points[i].x, stroke.points[i].y);
-          }
-          ctx.closePath();
-        } else {
-          ctx.beginPath();
-          for (let i = 0; i < stroke.points.length; i++) {
-            ctx.moveTo(stroke.points[i].x, stroke.points[i].y);
-            ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
-          }
-          ctx.closePath();
-        }
-        ctx.closePath();
-        ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+      for (let i = 1; i < stroke.points.length; i++) {
+        ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+        ctx.moveTo(stroke.points[i].x, stroke.points[i].y);
       }
-    },
-    [BUCKET]
-  );
-
-  const floodFill = (event) => {
-    const ctx = canvasCTX;
-    const localX = isMobile
-      ? Math.floor(event.touches[0].clientX - whiteboardRef.current.offsetLeft)
-      : Math.floor(event.clientX - whiteboardRef.current.offsetLeft);
-    const localY = isMobile
-      ? Math.floor(event.touches[0].clientY - whiteboardRef.current.offsetTop)
-      : Math.floor(event.clientY - whiteboardRef.current.offsetTop);
-    const scale = 3;
-
-    const nextStroke = {
-      color: primary,
-      size: scale * 1.5,
-      tool: tool,
-      points: [],
-    };
-
-    function componentToHex(c) {
-      var hex = c.toString(16);
-      return hex.length === 1 ? "0" + hex : hex;
+      ctx.closePath();
+      ctx.stroke();
     }
-
-    function rgbToHex(r, g, b) {
-      return (
-        "#" +
-        componentToHex(r) +
-        componentToHex(g) +
-        componentToHex(b)
-      ).toUpperCase();
-    }
-
-    const targetRGB = ctx.getImageData(localX, localY, 1, 1).data;
-    const target = rgbToHex(targetRGB[0], targetRGB[1], targetRGB[2]);
-    const queue = [[localX, localY]];
-    const visited = {};
-
-    if (target === primary) return;
-
-    while (queue.length) {
-      const [cx, cy] = queue.shift();
-      const currentRGB = ctx.getImageData(cx, cy, 1, 1).data;
-      const current = rgbToHex(currentRGB[0], currentRGB[1], currentRGB[2]);
-
-      if (!visited[`${cx},${cy}`] && current === target) {
-        nextStroke.points.push({ x: cx, y: cy });
-        visited[`${cx},${cy}`] = true;
-
-        const left = cx - scale;
-        const right = cx + scale;
-        const up = cy - scale;
-        const down = cy + scale;
-
-        if (left >= 0 && !visited[`${left},${cy}`]) {
-          queue.push([left, cy]);
-        }
-        if (right < width && !visited[`${right},${cy}`]) {
-          queue.push([right, cy]);
-        }
-        if (up >= 0 && !visited[`${cx},${up}`]) {
-          queue.push([cx, up]);
-        }
-        if (down < height && !visited[`${cx},${down}`]) {
-          queue.push([cx, down]);
-        }
-      }
-    }
-
-    setRedoHistory([]);
-    setDrawHistory((prevHistory) => [...prevHistory, nextStroke]);
-  };
+  }, []);
 
   const redrawCanvas = useCallback(() => {
     const ctx = canvasCTX;
@@ -289,8 +205,7 @@ function Canvas() {
         onMouseDown={(event) => {
           if (!isMobile) {
             event.preventDefault();
-            if (tool !== BUCKET) startDrawing(event);
-            else floodFill(event);
+            startDrawing(event);
           }
         }}
         onMouseMove={(event) => {
@@ -315,8 +230,7 @@ function Canvas() {
         onTouchStart={(event) => {
           if (isMobile) {
             setShowBrush(true);
-            if (tool !== BUCKET) startDrawing(event);
-            else floodFill(event);
+            startDrawing(event);
           }
         }}
         onTouchMove={(event) => {
@@ -333,7 +247,7 @@ function Canvas() {
         <div
           className="Paintbrush"
           style={
-            showBrush && tool !== BUCKET
+            showBrush && !isDrawing
               ? {
                   left: `${mouseData.x}px`,
                   top: `${mouseData.y}px`,
@@ -343,19 +257,6 @@ function Canvas() {
               : { display: "none" }
           }
         />
-        <div
-          className="Bucket"
-          style={
-            showBrush && tool === BUCKET && !isMobile
-              ? {
-                  left: `${mouseData.x}px`,
-                  top: `${mouseData.y}px`,
-                }
-              : { display: "none" }
-          }
-        >
-          +
-        </div>
       </div>
     </div>
   );

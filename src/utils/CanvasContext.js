@@ -86,11 +86,6 @@ export function useEraserTool() {
   return useContext(EraserToolContext);
 }
 
-const BucketToolContext = createContext();
-export function useBucketTool() {
-  return useContext(BucketToolContext);
-}
-
 const RedrawContext = createContext();
 export function useRedraw() {
   return useContext(RedrawContext);
@@ -112,7 +107,7 @@ export function CanvasProvider({ children }) {
   const [size, setSize] = useState(3);
   const [drawHistory, setDrawHistory] = useState([]);
   const [redoHistory, setRedoHistory] = useState([]);
-  const [BRUSH, ERASER, BUCKET] = [0, 1, 2];
+  const [BRUSH, ERASER] = [0, 1];
   const [tool, setTool] = useState(BRUSH);
   const [redraw, setRedraw] = useState(false);
   const [word, setWord] = useState("");
@@ -154,7 +149,6 @@ export function CanvasProvider({ children }) {
 
   const setBrush = useCallback(() => setTool(BRUSH), [BRUSH]);
   const setEraser = useCallback(() => setTool(ERASER), [ERASER]);
-  const setBucket = useCallback(() => setTool(BUCKET), [BUCKET]);
 
   return (
     <PrimaryContext.Provider value={primary}>
@@ -173,19 +167,15 @@ export function CanvasProvider({ children }) {
                               <ToolContext.Provider value={tool}>
                                 <BrushToolContext.Provider value={setBrush}>
                                   <EraserToolContext.Provider value={setEraser}>
-                                    <BucketToolContext.Provider
-                                      value={setBucket}
-                                    >
-                                      <RedrawContext.Provider value={redraw}>
-                                        <RedrawUpdateContext.Provider
-                                          value={setRedraw}
-                                        >
-                                          <WordContext.Provider value={word}>
-                                            {children}
-                                          </WordContext.Provider>
-                                        </RedrawUpdateContext.Provider>
-                                      </RedrawContext.Provider>
-                                    </BucketToolContext.Provider>
+                                    <RedrawContext.Provider value={redraw}>
+                                      <RedrawUpdateContext.Provider
+                                        value={setRedraw}
+                                      >
+                                        <WordContext.Provider value={word}>
+                                          {children}
+                                        </WordContext.Provider>
+                                      </RedrawUpdateContext.Provider>
+                                    </RedrawContext.Provider>
                                   </EraserToolContext.Provider>
                                 </BrushToolContext.Provider>
                               </ToolContext.Provider>
