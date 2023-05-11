@@ -3,7 +3,6 @@ import {
   useSecondary,
   useSecondaryUpdate,
   useBrushTool,
-  useBucketTool,
   usePrimary,
   usePrimaryUpdate,
   useEraserTool,
@@ -20,7 +19,7 @@ import { usePortrait } from "../../utils/usePortrait";
 import "./Controls.css";
 
 function Controls() {
-  const defaultSize = [3, 5, 10];
+  const defaultSize = [1, 5, 15];
   const primary = usePrimary();
   const setPrimary = usePrimaryUpdate();
   const secondary = useSecondary();
@@ -33,8 +32,7 @@ function Controls() {
   const tool = useTool();
   const setBrush = useBrushTool();
   const setEraser = useEraserTool();
-  const setBucket = useBucketTool();
-  const [BRUSH, ERASER, BUCKET] = [0, 1, 2];
+  const [BRUSH, ERASER] = [0, 1];
 
   const isMobile = useMobile();
   const isPortrait = usePortrait();
@@ -77,7 +75,6 @@ function Controls() {
               key={size}
               onClick={() => {
                 setSize(size);
-                if (tool === BUCKET) setBrush();
               }}
             >
               <div style={{ width: size, height: size }} />
@@ -99,7 +96,6 @@ function Controls() {
                 ? defaultSize[defaultSize.length - 1]
                 : event.target.value
             );
-            if (tool === BUCKET) setBrush();
           }}
         />
         <input
@@ -115,7 +111,6 @@ function Controls() {
                 ? defaultSize[defaultSize.length - 1]
                 : event.target.value
             );
-            if (tool === BUCKET) setBrush();
           }}
         />
       </div>
@@ -158,15 +153,6 @@ function Controls() {
           }}
         >
           <img src="https://api.iconify.design/mdi:eraser.svg" alt="" />
-        </div>
-        <div
-          className="Tool"
-          style={tool === BUCKET ? { background: "rgb(190, 190, 190)" } : {}}
-          onClick={() => {
-            setBucket();
-          }}
-        >
-          <img src="https://api.iconify.design/gg:color-bucket.svg" alt="" />
         </div>
       </div>
       <button
