@@ -106,6 +106,7 @@
 }
 
 .ToolGrid {
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(2, auto);
   justify-content: center;
@@ -130,7 +131,7 @@
 }
 
 .Tool > img {
-  width: 45%;
+  width: 40%;
 }
 
 .Tool:hover {
