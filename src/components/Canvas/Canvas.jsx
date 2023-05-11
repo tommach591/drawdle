@@ -27,8 +27,8 @@ function Canvas() {
   const redraw = useRedraw();
   const setRedraw = useRedrawUpdate();
   const tool = useTool();
-  // eslint-disable-next-line no-unused-vars
-  const [BRUSH, ERASER] = [0, 1];
+
+  const BRUSH = 0;
 
   const isMobile = useMobile();
   const whiteboardRef = useRef(null);
@@ -73,6 +73,7 @@ function Canvas() {
 
   const finishDrawing = () => {
     setIsDrawing(false);
+    setRedraw(true);
   };
 
   const draw = (event) => {
