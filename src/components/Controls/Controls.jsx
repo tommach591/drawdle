@@ -19,7 +19,7 @@ import { usePortrait } from "../../utils/usePortrait";
 import "./Controls.css";
 
 function Controls() {
-  const defaultSize = [1, 5, 15];
+  const defaultSize = [1, 5, 20];
   const primary = usePrimary();
   const setPrimary = usePrimaryUpdate();
   const secondary = useSecondary();

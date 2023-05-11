@@ -5,7 +5,7 @@ import { useWord } from "../../utils/CanvasContext";
 
 import Sample from "../../assets/sample.txt"; // Words from Quick, Draw!
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Drawing from "../Drawing/Drawing";
+import Drawing from "../Drawing";
 
 function Gallery() {
   const isMobile = useMobile();

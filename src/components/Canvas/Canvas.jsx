@@ -97,7 +97,7 @@ function Canvas() {
   };
 
   const drawStroke = useCallback((ctx, stroke) => {
-    if (stroke && stroke.points.length > 0) {
+    if (ctx && stroke && stroke.points.length > 0) {
       ctx.strokeStyle = stroke.color;
       ctx.lineWidth = stroke.size;
       ctx.lineCap = "round";
