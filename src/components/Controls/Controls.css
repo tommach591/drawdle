@@ -1,8 +1,6 @@
 .Controls {
-  width: 9rem;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
   position: relative;
 
   margin-top: 0.5rem;
@@ -10,7 +8,15 @@
   margin-right: 1rem;
 }
 
-.Controls > * {
+.MainPanel {
+  width: 9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.MainPanel > * {
   width: 100%;
   margin: 0.25rem;
 }
@@ -60,6 +66,8 @@
 
   border: 1px solid black;
   border-radius: 5px;
+
+  background: white;
 }
 
 .DefaultSizes:hover {
@@ -107,31 +115,33 @@
 
 .ToolGrid {
   width: 100%;
-  display: grid;
-  grid-template-columns: repeat(2, auto);
+  display: flex;
   justify-content: center;
-  gap: 5px;
 
   margin-bottom: 0.5rem;
 }
 
 .Tool {
-  width: 4rem;
-  height: 2.5rem;
+  width: 45%;
+  height: 1.5rem;
 
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
 
   position: relative;
 
   border: 1px solid black;
-  border-radius: 5px;
+  border-radius: 3px;
+
+  margin-left: 0.1rem;
+  margin-right: 0.1rem;
+
+  background: white;
 }
 
 .Tool > img {
-  width: 40%;
+  height: 100%;
 }
 
 .Tool:hover {
@@ -140,4 +150,29 @@
 
 .BigButton {
   width: 95%;
+}
+
+.SidePanel {
+  margin-left: 0.5rem;
+}
+
+.SidePanel > * {
+  margin-top: 0.75rem;
+}
+
+.ColorHistoryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  justify-content: center;
+  gap: 5px;
+}
+
+.ColorHistory {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid black;
+}
+
+.ColorHistory:hover {
+  cursor: pointer;
 }

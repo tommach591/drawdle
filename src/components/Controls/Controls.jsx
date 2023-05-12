@@ -13,6 +13,7 @@ import {
   useSizeUpdate,
   useTool,
   useWord,
+  useColorHistory,
 } from "../../utils/CanvasContext";
 import { useMobile } from "../../utils/useMobile";
 import { usePortrait } from "../../utils/usePortrait";
@@ -37,145 +38,172 @@ function Controls() {
   const isMobile = useMobile();
   const isPortrait = usePortrait();
   const word = useWord();
+  const colorHistory = useColorHistory();
 
   const navigate = useNavigate();
 
   return (
-    <div className="Controls">
-      {isMobile ? (
-        isPortrait ? (
-          <div />
+    <div
+      className="Controls"
+      style={
+        isMobile && window.innerHeight >= 750
+          ? { zoom: `${145}%` }
+          : { zoom: `${100}%` }
+      }
+    >
+      <div className="MainPanel">
+        {isMobile ? (
+          isPortrait ? (
+            <div />
+          ) : (
+            <h1 className="Word">{word}</h1>
+          )
         ) : (
-          <h1 className="Word">{word}</h1>
-        )
-      ) : (
-        <div />
-      )}
-      <div className="History">
-        <button
-          onClick={() => {
-            handleUndo();
-          }}
-        >
-          <img src="https://api.iconify.design/ic:round-undo.svg" alt="" />
-        </button>
-        <button
-          onClick={() => {
-            handleRedo();
-          }}
-        >
-          <img src="https://api.iconify.design/ic:round-redo.svg" alt="" />
-        </button>
-      </div>
-      <div className="SizeGrid">
-        {defaultSize.map((size) => {
-          return (
-            <div
-              className="DefaultSizes"
-              key={size}
-              onClick={() => {
-                setSize(size);
-              }}
-            >
-              <div style={{ width: size, height: size }} />
-              <h1>{size}</h1>
-            </div>
-          );
-        })}
-      </div>
-      <div className="Size">
-        <input
-          className="Number"
-          type="number"
-          value={size}
-          max={defaultSize[defaultSize.length - 1]}
-          min={defaultSize[0]}
-          onChange={(event) => {
-            setSize(
-              event.target.value > defaultSize[defaultSize.length - 1]
-                ? defaultSize[defaultSize.length - 1]
-                : event.target.value
+          <div />
+        )}
+        <div className="History">
+          <button
+            onClick={() => {
+              handleUndo();
+            }}
+          >
+            <img src="https://api.iconify.design/ic:round-undo.svg" alt="" />
+          </button>
+          <button
+            onClick={() => {
+              handleRedo();
+            }}
+          >
+            <img src="https://api.iconify.design/ic:round-redo.svg" alt="" />
+          </button>
+        </div>
+        <div className="SizeGrid">
+          {defaultSize.map((size) => {
+            return (
+              <div
+                className="DefaultSizes"
+                key={size}
+                onClick={() => {
+                  setSize(size);
+                }}
+              >
+                <div style={{ width: size, height: size }} />
+                <h1>{size}</h1>
+              </div>
             );
-          }}
-        />
-        <input
-          className="Range"
-          type="range"
-          value={size}
-          max={defaultSize[defaultSize.length - 1]}
-          min={defaultSize[0]}
-          step={1}
-          onChange={(event) => {
-            setSize(
-              event.target.value > defaultSize[defaultSize.length - 1]
-                ? defaultSize[defaultSize.length - 1]
-                : event.target.value
-            );
-          }}
-        />
-      </div>
-      <div className="ColorGrid">
-        <input
-          className="Color"
-          type="color"
-          value={primary}
-          onChange={(event) => {
-            setPrimary(event.target.value);
-          }}
-        />
-        <input
-          className="Color"
-          type="color"
-          value={secondary}
-          onChange={(event) => {
-            setSecondary(event.target.value);
-          }}
-        />
-      </div>
-      <div className="ToolGrid">
-        <div
-          className="Tool"
-          style={tool === BRUSH ? { background: "rgb(190, 190, 190)" } : {}}
-          onClick={() => {
-            setBrush();
-          }}
-        >
-          <img
-            src="https://api.iconify.design/material-symbols:brush-outline.svg"
-            alt=""
+          })}
+        </div>
+        <div className="Size">
+          <input
+            className="Number"
+            type="number"
+            value={size}
+            max={defaultSize[defaultSize.length - 1]}
+            min={defaultSize[0]}
+            onChange={(event) => {
+              setSize(
+                event.target.value > defaultSize[defaultSize.length - 1]
+                  ? defaultSize[defaultSize.length - 1]
+                  : event.target.value
+              );
+            }}
+          />
+          <input
+            className="Range"
+            type="range"
+            value={size}
+            max={defaultSize[defaultSize.length - 1]}
+            min={defaultSize[0]}
+            step={1}
+            onChange={(event) => {
+              setSize(
+                event.target.value > defaultSize[defaultSize.length - 1]
+                  ? defaultSize[defaultSize.length - 1]
+                  : event.target.value
+              );
+            }}
           />
         </div>
-        <div
-          className="Tool"
-          style={tool === ERASER ? { background: "rgb(190, 190, 190)" } : {}}
+        <div className="ColorGrid">
+          <input
+            className="Color"
+            type="color"
+            value={primary}
+            onChange={(event) => {
+              setPrimary(event.target.value);
+            }}
+          />
+          <input
+            className="Color"
+            type="color"
+            value={secondary}
+            onChange={(event) => {
+              setSecondary(event.target.value);
+            }}
+          />
+        </div>
+        <div className="ToolGrid">
+          <div
+            className="Tool"
+            style={tool === BRUSH ? { background: "rgb(190, 190, 190)" } : {}}
+            onClick={() => {
+              setBrush();
+            }}
+          >
+            <img
+              src="https://api.iconify.design/material-symbols:brush-outline.svg"
+              alt=""
+            />
+          </div>
+          <div
+            className="Tool"
+            style={tool === ERASER ? { background: "rgb(190, 190, 190)" } : {}}
+            onClick={() => {
+              setEraser();
+            }}
+          >
+            <img src="https://api.iconify.design/mdi:eraser.svg" alt="" />
+          </div>
+        </div>
+        <button
+          className="BigButton"
           onClick={() => {
-            setEraser();
+            const response = window.confirm(
+              "This action cannot be undone, clear canvas?"
+            );
+            if (response) {
+              handleClear();
+            }
           }}
         >
-          <img src="https://api.iconify.design/mdi:eraser.svg" alt="" />
+          Clear
+        </button>
+        <button
+          className="BigButton"
+          onClick={() => {
+            navigate(`/gallery`);
+          }}
+        >
+          Submit
+        </button>
+      </div>
+      <div className="SidePanel">
+        <div className="ColorHistoryGrid">
+          {colorHistory.map((c, i) => {
+            return (
+              <div
+                className="ColorHistory"
+                key={i}
+                style={{ background: c }}
+                onClick={() => {
+                  if (tool === BRUSH) setPrimary(c);
+                  else setSecondary(c);
+                }}
+              />
+            );
+          })}
         </div>
       </div>
-      <button
-        className="BigButton"
-        onClick={() => {
-          const response = window.confirm(
-            "This action cannot be undone, clear canvas?"
-          );
-          if (response) {
-            handleClear();
-          }
-        }}
-      >
-        Clear
-      </button>
-      <button
-        className="BigButton"
-        onClick={() => {
-          navigate(`/gallery`);
-        }}
-      >
-        Submit
-      </button>
     </div>
   );
 }

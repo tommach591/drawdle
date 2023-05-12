@@ -101,16 +101,39 @@ export function useWord() {
   return useContext(WordContext);
 }
 
+const ColorHistoryContext = createContext();
+export function useColorHistory() {
+  return useContext(ColorHistoryContext);
+}
+
+const UpdateColorHistoryContext = createContext();
+export function useUpdateColorHistory() {
+  return useContext(UpdateColorHistoryContext);
+}
+
 export function CanvasProvider({ children }) {
   const [primary, setPrimary] = useState("#000000");
   const [secondary, setSecondary] = useState("#FFFFFF");
-  const [size, setSize] = useState(3);
+  const [size, setSize] = useState(5);
   const [drawHistory, setDrawHistory] = useState([]);
   const [redoHistory, setRedoHistory] = useState([]);
   const [BRUSH, ERASER] = [0, 1];
   const [tool, setTool] = useState(BRUSH);
   const [redraw, setRedraw] = useState(false);
   const [word, setWord] = useState("");
+
+  const [colorHistory, setColorHistory] = useState([
+    "#ffffff",
+    "#ffffff",
+    "#ffffff",
+    "#ffffff",
+    "#ffffff",
+    "#ffffff",
+    "#ffffff",
+    "#ffffff",
+    "#ffffff",
+    "#ffffff",
+  ]);
 
   useEffect(() => {
     fetch(Categories)
@@ -147,6 +170,19 @@ export function CanvasProvider({ children }) {
     setRedraw(true);
   }, []);
 
+  const updateColorHistory = useCallback(() => {
+    let newColorHistory = [...colorHistory];
+    if (tool === BRUSH && !newColorHistory.includes(primary)) {
+      newColorHistory.unshift(primary);
+      newColorHistory.pop();
+      setColorHistory(newColorHistory);
+    } else if (tool === ERASER && !newColorHistory.includes(secondary)) {
+      newColorHistory.unshift(secondary);
+      newColorHistory.pop();
+      setColorHistory(newColorHistory);
+    }
+  }, [colorHistory, BRUSH, ERASER, tool, primary, secondary]);
+
   const setBrush = useCallback(() => setTool(BRUSH), [BRUSH]);
   const setEraser = useCallback(() => setTool(ERASER), [ERASER]);
 
@@ -172,7 +208,15 @@ export function CanvasProvider({ children }) {
                                         value={setRedraw}
                                       >
                                         <WordContext.Provider value={word}>
-                                          {children}
+                                          <ColorHistoryContext.Provider
+                                            value={colorHistory}
+                                          >
+                                            <UpdateColorHistoryContext.Provider
+                                              value={updateColorHistory}
+                                            >
+                                              {children}
+                                            </UpdateColorHistoryContext.Provider>
+                                          </ColorHistoryContext.Provider>
                                         </WordContext.Provider>
                                       </RedrawUpdateContext.Provider>
                                     </RedrawContext.Provider>

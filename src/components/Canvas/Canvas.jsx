@@ -12,6 +12,7 @@ import {
   useRedrawUpdate,
   useSize,
   useTool,
+  useUpdateColorHistory,
 } from "../../utils/CanvasContext";
 import { useMobile } from "../../utils/useMobile";
 
@@ -27,6 +28,7 @@ function Canvas() {
   const redraw = useRedraw();
   const setRedraw = useRedrawUpdate();
   const tool = useTool();
+  const updateColorHistory = useUpdateColorHistory();
 
   const BRUSH = 0;
 
@@ -69,6 +71,8 @@ function Canvas() {
         points: [{ x: localX, y: localY }],
       },
     ]);
+
+    updateColorHistory();
   };
 
   const finishDrawing = () => {

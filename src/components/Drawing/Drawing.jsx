@@ -7,8 +7,6 @@ function Drawing({ drawing, drawingWidth, drawingHeight }) {
   const canvasRef = useRef(null);
   const [canvasCTX, setCanvasCTX] = useState(null);
   const [width, height] = useMemo(() => [300, 300], []);
-  // eslint-disable-next-line no-unused-vars
-  const [BRUSH, ERASER, BUCKET] = [0, 1, 2];
 
   const drawResizedImage = useCallback(
     (canvas, offscreenCanvas) => {
@@ -40,36 +38,23 @@ function Drawing({ drawing, drawingWidth, drawingHeight }) {
     [canvasCTX]
   );
 
-  const drawStroke = useCallback(
-    (ctx, stroke) => {
-      if (stroke && stroke.points.length > 0) {
-        ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = stroke.size;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
+  const drawStroke = useCallback((ctx, stroke) => {
+    if (stroke && stroke.points.length > 0) {
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth = stroke.size;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
 
-        if (stroke.tool !== BUCKET) {
-          ctx.beginPath();
-          ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
-          for (let i = 1; i < stroke.points.length; i++) {
-            ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
-            ctx.moveTo(stroke.points[i].x, stroke.points[i].y);
-          }
-          ctx.closePath();
-        } else {
-          ctx.beginPath();
-          for (let i = 0; i < stroke.points.length; i++) {
-            ctx.moveTo(stroke.points[i].x, stroke.points[i].y);
-            ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
-          }
-          ctx.closePath();
-        }
-        ctx.closePath();
-        ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+      for (let i = 1; i < stroke.points.length; i++) {
+        ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+        ctx.moveTo(stroke.points[i].x, stroke.points[i].y);
       }
-    },
-    [BUCKET]
-  );
+      ctx.closePath();
+      ctx.stroke();
+    }
+  }, []);
 
   const redrawCanvas = useCallback(() => {
     const offscreenCtx = offscreenCanvasCTX;
