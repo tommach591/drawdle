@@ -6,13 +6,15 @@ import { useWord } from "../../utils/CanvasContext";
 import Header from "../Header";
 import Home from "../Home";
 import Gallery from "../Gallery";
+import { usePing } from "../../utils/usePing";
 
 function App() {
   const isMobile = useMobile();
   const isPortrait = usePortrait();
   const word = useWord();
+  const ping = usePing();
 
-  return (
+  return ping ? (
     <div className="App">
       <Header />
       {isMobile ? (
@@ -29,6 +31,8 @@ function App() {
         <Route path="/gallery" element={<Gallery />} />
       </Routes>
     </div>
+  ) : (
+    <div />
   );
 }
 
