@@ -5,7 +5,7 @@ import {
   useCallback,
   useEffect,
 } from "react";
-import Categories from "../assets/categories.txt"; // Words from Quick, Draw!
+import { getWord, postDaily } from "./Word";
 
 const PrimaryContext = createContext();
 export function usePrimary() {
@@ -136,12 +136,15 @@ export function CanvasProvider({ children }) {
   ]);
 
   useEffect(() => {
-    fetch(Categories)
-      .then((res) => res.text())
-      .then((text) => {
-        const list = text.split("\r\n");
-        setWord(list[Math.floor(Math.random() * list.length)].toUpperCase());
-      });
+    getWord().then((res) => {
+      if (res) {
+        setWord(res.word);
+      } else {
+        postDaily().then((res) => {
+          setWord(res.word);
+        });
+      }
+    });
   }, []);
 
   const handleUndo = useCallback(() => {
