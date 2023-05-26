@@ -14,10 +14,12 @@ import {
   useTool,
   useWord,
   useColorHistory,
+  useDrawHistory,
 } from "../../utils/CanvasContext";
 import { useMobile } from "../../utils/useMobile";
 import { usePortrait } from "../../utils/usePortrait";
 import "./Controls.css";
+import { saveDrawing } from "../../utils/Drawing";
 
 function Controls() {
   const defaultSize = [1, 5, 20];
@@ -30,6 +32,7 @@ function Controls() {
   const handleUndo = useHandleUndo();
   const handleRedo = useHandleRedo();
   const handleClear = useHandleClear();
+  const drawHistory = useDrawHistory();
   const tool = useTool();
   const setBrush = useBrushTool();
   const setEraser = useEraserTool();
@@ -181,6 +184,8 @@ function Controls() {
         <button
           className="BigButton"
           onClick={() => {
+            saveDrawing(drawHistory);
+            handleClear();
             navigate(`/gallery`);
           }}
         >

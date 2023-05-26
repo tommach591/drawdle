@@ -57,23 +57,13 @@ function Drawing({ drawing, drawingWidth, drawingHeight }) {
   }, []);
 
   const redrawCanvas = useCallback(() => {
-    const offscreenCtx = offscreenCanvasCTX;
-    if (offscreenCtx) {
-      offscreenCtx.clearRect(
-        0,
-        0,
-        canvasRef.current.width,
-        canvasRef.current.height
-      );
-      offscreenCtx.fillStyle = "#FFFFFF";
-      offscreenCtx.fillRect(
-        0,
-        0,
-        canvasRef.current.width,
-        canvasRef.current.height
-      );
+    const off = offscreenCanvasCTX;
+    if (off) {
+      off.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      off.fillStyle = "#FFFFFF";
+      off.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       for (const stroke of drawing) {
-        drawStroke(offscreenCtx, stroke);
+        drawStroke(off, stroke);
       }
       drawResizedImage(canvasRef.current, offscreenRef.current);
     }
@@ -113,7 +103,15 @@ function Drawing({ drawing, drawingWidth, drawingHeight }) {
       offscreenRef.current.height
     );
     setOffscreenCanvasCTX(offscreenCtx);
-  }, [canvasRef, offscreenRef, width, height, drawingWidth, drawingHeight]);
+  }, [
+    drawing,
+    canvasRef,
+    offscreenRef,
+    width,
+    height,
+    drawingWidth,
+    drawingHeight,
+  ]);
 
   useEffect(() => {
     let animationFrameId = requestAnimationFrame(redrawCanvas);

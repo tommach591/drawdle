@@ -3,9 +3,9 @@ import { useMobile } from "../../utils/useMobile";
 import { usePortrait } from "../../utils/usePortrait";
 import { useWord } from "../../utils/CanvasContext";
 
-import Sample from "../../assets/sample.txt"; // Words from Quick, Draw!
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Drawing from "../Drawing";
+import { getDrawings } from "../../utils/Drawing";
 
 function Gallery() {
   const isMobile = useMobile();
@@ -14,22 +14,13 @@ function Gallery() {
   const galleryRef = useRef();
 
   const [drawingWidth, drawingHeight] = useMemo(() => [175, 175], []);
-  const [sample, setSample] = useState("");
+  const [sample, setSample] = useState([]);
 
   const fetchMoreDrawings = useCallback(() => {
-    fetch(Sample)
-      .then((res) => res.text())
-      .then((text) => {
-        const newSample = JSON.parse(text);
-        setSample([
-          ...sample,
-          ...newSample,
-          ...newSample,
-          ...newSample,
-          ...newSample,
-          ...newSample,
-        ]);
-      });
+    const limit = 10;
+    getDrawings(limit, sample.length).then((res) => {
+      setSample([...sample, ...res]);
+    });
   }, [sample]);
 
   useEffect(() => {
@@ -74,7 +65,7 @@ function Gallery() {
             return (
               <Drawing
                 key={i}
-                drawing={drawing}
+                drawing={drawing.drawHistory}
                 drawingWidth={drawingWidth}
                 drawingHeight={drawingHeight}
               />

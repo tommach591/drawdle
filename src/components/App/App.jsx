@@ -7,6 +7,8 @@ import Header from "../Header";
 import Home from "../Home";
 import Gallery from "../Gallery";
 import { usePing } from "../../utils/usePing";
+import { deleteAllWords } from "../../utils/Word";
+import { deleteAllDrawings } from "../../utils/Drawing";
 
 function App() {
   const isMobile = useMobile();
