@@ -5,6 +5,7 @@ import { usePortrait } from "../../utils/usePortrait";
 
 function Home() {
   const isPortrait = usePortrait();
+
   return (
     <div
       className="Home"

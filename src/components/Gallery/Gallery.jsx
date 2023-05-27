@@ -12,27 +12,31 @@ function Gallery() {
   const isPortrait = usePortrait();
   const word = useWord();
   const galleryRef = useRef();
+  const [sort, setSort] = useState("recent");
 
   const [drawingWidth, drawingHeight] = useMemo(() => [175, 175], []);
   const [sample, setSample] = useState([]);
 
-  const fetchMoreDrawings = useCallback(() => {
-    const limit = 10;
-    getDrawings(limit, sample.length).then((res) => {
-      setSample([...sample, ...res]);
-    });
-  }, [sample]);
+  const fetchMoreDrawings = useCallback(
+    (prev) => {
+      const limit = 10;
+      getDrawings(sort, limit, prev.length).then((res) => {
+        setSample([...prev, ...res]);
+      });
+    },
+    [sort]
+  );
 
   useEffect(() => {
-    fetchMoreDrawings();
+    fetchMoreDrawings([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [sort]);
 
   const onScroll = () => {
     if (galleryRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = galleryRef.current;
       if (scrollTop + clientHeight === scrollHeight) {
-        fetchMoreDrawings();
+        fetchMoreDrawings(sample);
       }
     }
   };
@@ -43,11 +47,33 @@ function Gallery() {
         isPortrait ? (
           <div />
         ) : (
-          <h1 className="Word">{word}</h1>
+          <h1 className="Word" style={{ marginBottom: "10px" }}>
+            {word}
+          </h1>
         )
       ) : (
         <div />
       )}
+      <div className="SortGrid">
+        <div
+          className="SortOption"
+          style={sort === "recent" ? { background: "rgb(190, 190, 190)" } : {}}
+          onClick={() => {
+            setSort("recent");
+          }}
+        >
+          <h1>Recent</h1>
+        </div>
+        <div
+          className="SortOption"
+          style={sort === "likes" ? { background: "rgb(190, 190, 190)" } : {}}
+          onClick={() => {
+            setSort("likes");
+          }}
+        >
+          <h1>Likes</h1>
+        </div>
+      </div>
       <div
         className="DrawingGrid"
         style={
@@ -65,7 +91,7 @@ function Gallery() {
             return (
               <Drawing
                 key={i}
-                drawing={drawing.drawHistory}
+                drawing={drawing}
                 drawingWidth={drawingWidth}
                 drawingHeight={drawingHeight}
               />

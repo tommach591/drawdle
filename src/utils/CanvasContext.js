@@ -111,6 +111,26 @@ export function useUpdateColorHistory() {
   return useContext(UpdateColorHistoryContext);
 }
 
+const DrawingContext = createContext();
+export function useDrawing() {
+  return useContext(DrawingContext);
+}
+
+const UpdateDrawingContext = createContext();
+export function useUpdateDrawing() {
+  return useContext(UpdateDrawingContext);
+}
+
+const LikesContext = createContext();
+export function useLikes() {
+  return useContext(LikesContext);
+}
+
+const UpdateLikesContext = createContext();
+export function useUpdateLikes() {
+  return useContext(UpdateLikesContext);
+}
+
 export function CanvasProvider({ children }) {
   const [primary, setPrimary] = useState("#000000");
   const [secondary, setSecondary] = useState("#FFFFFF");
@@ -121,6 +141,9 @@ export function CanvasProvider({ children }) {
   const [tool, setTool] = useState(BRUSH);
   const [redraw, setRedraw] = useState(false);
   const [word, setWord] = useState("");
+
+  const [drawings, setDrawings] = useState({});
+  const [likes, setLikes] = useState(new Set());
 
   const [colorHistory, setColorHistory] = useState([
     "#ffffff",
@@ -136,6 +159,19 @@ export function CanvasProvider({ children }) {
   ]);
 
   useEffect(() => {
+    // localStorage.clear();
+    let storedDrawings = JSON.parse(localStorage.getItem("drawings"));
+    let storedLikes = JSON.parse(localStorage.getItem("likes"));
+
+    if (!storedDrawings) storedDrawings = {};
+    if (!storedLikes) storedLikes = [];
+
+    console.log(storedDrawings);
+    console.log(storedLikes);
+
+    setDrawings(storedDrawings);
+    setLikes(new Set(storedLikes));
+
     getWord().then((res) => {
       if (res) {
         setWord(res.word);
@@ -145,6 +181,28 @@ export function CanvasProvider({ children }) {
         });
       }
     });
+
+    const currentTime = new Date();
+    const nextDay = new Date(currentTime);
+    nextDay.setDate(nextDay.getDate() + 1);
+    nextDay.setHours(0, 0, 0, 0);
+
+    const interval = setInterval(
+      () =>
+        getWord().then((res) => {
+          if (res) {
+            setWord(res.word);
+          } else {
+            postDaily().then((res) => {
+              setWord(res.word);
+            });
+          }
+        }),
+      nextDay - currentTime
+    );
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   const handleUndo = useCallback(() => {
@@ -189,6 +247,32 @@ export function CanvasProvider({ children }) {
   const setBrush = useCallback(() => setTool(BRUSH), [BRUSH]);
   const setEraser = useCallback(() => setTool(ERASER), [ERASER]);
 
+  const addDrawing = useCallback(
+    (drawing_id) => {
+      const newDrawings = JSON.parse(JSON.stringify(drawings));
+      const currentTime = new Date();
+      const currentDay = new Date(currentTime.toDateString());
+
+      newDrawings[currentDay] = drawing_id;
+      setDrawings(newDrawings);
+      localStorage.setItem("drawings", JSON.stringify(newDrawings));
+    },
+    [drawings]
+  );
+
+  const updateLikes = useCallback(
+    (drawing_id) => {
+      const newLikes = new Set(likes);
+
+      if (newLikes.has(drawing_id)) newLikes.delete(drawing_id);
+      else newLikes.add(drawing_id);
+
+      setLikes(newLikes);
+      localStorage.setItem("likes", JSON.stringify(Array.from(newLikes)));
+    },
+    [likes]
+  );
+
   return (
     <PrimaryContext.Provider value={primary}>
       <PrimaryUpdateContext.Provider value={setPrimary}>
@@ -217,7 +301,23 @@ export function CanvasProvider({ children }) {
                                             <UpdateColorHistoryContext.Provider
                                               value={updateColorHistory}
                                             >
-                                              {children}
+                                              <DrawingContext.Provider
+                                                value={drawings}
+                                              >
+                                                <UpdateDrawingContext.Provider
+                                                  value={addDrawing}
+                                                >
+                                                  <LikesContext.Provider
+                                                    value={likes}
+                                                  >
+                                                    <UpdateLikesContext.Provider
+                                                      value={updateLikes}
+                                                    >
+                                                      {children}
+                                                    </UpdateLikesContext.Provider>
+                                                  </LikesContext.Provider>
+                                                </UpdateDrawingContext.Provider>
+                                              </DrawingContext.Provider>
                                             </UpdateColorHistoryContext.Provider>
                                           </ColorHistoryContext.Provider>
                                         </WordContext.Provider>

@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import {
   useSecondary,
   useSecondaryUpdate,
@@ -15,6 +14,7 @@ import {
   useWord,
   useColorHistory,
   useDrawHistory,
+  useUpdateDrawing,
 } from "../../utils/CanvasContext";
 import { useMobile } from "../../utils/useMobile";
 import { usePortrait } from "../../utils/usePortrait";
@@ -42,8 +42,7 @@ function Controls() {
   const isPortrait = usePortrait();
   const word = useWord();
   const colorHistory = useColorHistory();
-
-  const navigate = useNavigate();
+  const addDrawing = useUpdateDrawing();
 
   return (
     <div
@@ -184,9 +183,10 @@ function Controls() {
         <button
           className="BigButton"
           onClick={() => {
-            saveDrawing(drawHistory);
+            saveDrawing(drawHistory).then((res) => {
+              addDrawing(res._id);
+            });
             handleClear();
-            navigate(`/gallery`);
           }}
         >
           Submit

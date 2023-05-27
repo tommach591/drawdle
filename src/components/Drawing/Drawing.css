@@ -1,4 +1,25 @@
+.Drawing {
+  position: relative;
+}
+
 .DrawingCanvas {
   border: 1px solid black;
   border-radius: 5px;
+}
+
+.Likes {
+  display: flex;
+  align-items: center;
+
+  position: absolute;
+  bottom: 0;
+  left: 5px;
+}
+
+.Likes > img {
+  margin-right: 2px;
+}
+
+.Likes > h1 {
+  font-size: 12px;
 }

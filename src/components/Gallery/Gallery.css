@@ -12,6 +12,35 @@
   overflow-y: scroll;
 }
 
+.SortGrid {
+  display: flex;
+  justify-content: center;
+
+  margin-bottom: 0.5rem;
+}
+
+.SortOption {
+  width: 5rem;
+  height: 1.5rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  border: 1px solid black;
+  border-radius: 20px;
+
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+
+  background: white;
+
+  font-family: "Darumadrop One", cursive;
+  font-size: 14px;
+}
+
 .DrawingGrid {
   width: 100%;
   display: grid;

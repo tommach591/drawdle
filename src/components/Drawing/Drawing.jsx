@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./Drawing.css";
+import { likeDrawing } from "../../utils/Drawing";
+import { useLikes, useUpdateLikes } from "../../utils/CanvasContext";
 
 function Drawing({ drawing, drawingWidth, drawingHeight }) {
   const offscreenRef = useRef(null);
@@ -7,6 +9,32 @@ function Drawing({ drawing, drawingWidth, drawingHeight }) {
   const canvasRef = useRef(null);
   const [canvasCTX, setCanvasCTX] = useState(null);
   const [width, height] = useMemo(() => [300, 300], []);
+
+  const [drawingLikes, setDrawingLikes] = useState(0);
+  const likes = useLikes();
+  const updateLikes = useUpdateLikes();
+
+  function nFormatter(num, digits) {
+    const lookup = [
+      { value: 1, symbol: "" },
+      { value: 1e3, symbol: "k" },
+      { value: 1e6, symbol: "M" },
+      { value: 1e9, symbol: "G" },
+      { value: 1e12, symbol: "T" },
+      { value: 1e15, symbol: "P" },
+      { value: 1e18, symbol: "E" },
+    ];
+    const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+    var item = lookup
+      .slice()
+      .reverse()
+      .find(function (item) {
+        return num >= item.value;
+      });
+    return item
+      ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol
+      : "0";
+  }
 
   const drawResizedImage = useCallback(
     (canvas, offscreenCanvas) => {
@@ -57,12 +85,13 @@ function Drawing({ drawing, drawingWidth, drawingHeight }) {
   }, []);
 
   const redrawCanvas = useCallback(() => {
+    setDrawingLikes(drawing.likes);
     const off = offscreenCanvasCTX;
     if (off) {
       off.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       off.fillStyle = "#FFFFFF";
       off.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-      for (const stroke of drawing) {
+      for (const stroke of drawing.drawHistory) {
         drawStroke(off, stroke);
       }
       drawResizedImage(canvasRef.current, offscreenRef.current);
@@ -125,9 +154,31 @@ function Drawing({ drawing, drawingWidth, drawingHeight }) {
     <div
       className="Drawing"
       style={{ width: `${drawingWidth}px`, height: `${drawingHeight}px` }}
+      onClick={() => {
+        if (likes.has(drawing._id)) {
+          likeDrawing(drawing._id, -1);
+          updateLikes(drawing._id);
+          setDrawingLikes(drawingLikes - 1);
+        } else {
+          likeDrawing(drawing._id, 1);
+          updateLikes(drawing._id);
+          setDrawingLikes(drawingLikes + 1);
+        }
+      }}
     >
       <canvas className="DrawingCanvas" ref={canvasRef} />
       <canvas className="OffscreenCanvas" ref={offscreenRef} hidden />
+      <div className="Likes">
+        <img
+          src={
+            likes.has(drawing._id)
+              ? "https://api.iconify.design/material-symbols:favorite.svg"
+              : "https://api.iconify.design/material-symbols:favorite-outline.svg"
+          }
+          alt=""
+        />
+        <h1>{nFormatter(drawingLikes, 2)}</h1>
+      </div>
     </div>
   );
 }
