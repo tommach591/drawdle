@@ -187,19 +187,18 @@ export function CanvasProvider({ children }) {
     nextDay.setDate(nextDay.getDate() + 1);
     nextDay.setHours(0, 0, 0, 0);
 
-    const interval = setInterval(
-      () =>
-        getWord().then((res) => {
-          if (res) {
+    const interval = setInterval(() => {
+      alert("New day, new drawdle!");
+      getWord().then((res) => {
+        if (res) {
+          setWord(res.word);
+        } else {
+          postDaily().then((res) => {
             setWord(res.word);
-          } else {
-            postDaily().then((res) => {
-              setWord(res.word);
-            });
-          }
-        }),
-      nextDay - currentTime
-    );
+          });
+        }
+      });
+    }, nextDay - currentTime);
     return () => {
       clearInterval(interval);
     };
