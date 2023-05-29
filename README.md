@@ -6,3 +6,5 @@ The daily doodle web app!
 
 1. npm install
 2. npm run
+
+### Server @ https://github.com/tommach591/drawdle-server
