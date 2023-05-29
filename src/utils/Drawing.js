@@ -1,7 +1,9 @@
 const serverURL = "http://localhost:3001";
 
-export function getDrawings(byLikes, limit, offset) {
-  return fetch(`${serverURL}/api/drawing/get/${byLikes}/${limit}/${offset}`)
+export function getDrawings(date, byLikes, limit, offset) {
+  return fetch(
+    `${serverURL}/api/drawing/get/${date.toDateString()}/${byLikes}/${limit}/${offset}`
+  )
     .then((res) => {
       if (res.ok) return res.json();
       else return;

@@ -13,11 +13,12 @@ function Drawing({ drawing, drawingWidth, drawingHeight }) {
   const [drawingLikes, setDrawingLikes] = useState(0);
   const likes = useLikes();
   const updateLikes = useUpdateLikes();
+  const likeValue = 1;
 
   function nFormatter(num, digits) {
     const lookup = [
       { value: 1, symbol: "" },
-      { value: 1e3, symbol: "k" },
+      { value: 1e3, symbol: "K" },
       { value: 1e6, symbol: "M" },
       { value: 1e9, symbol: "G" },
       { value: 1e12, symbol: "T" },
@@ -156,13 +157,13 @@ function Drawing({ drawing, drawingWidth, drawingHeight }) {
       style={{ width: `${drawingWidth}px`, height: `${drawingHeight}px` }}
       onClick={() => {
         if (likes.has(drawing._id)) {
-          likeDrawing(drawing._id, -1);
+          likeDrawing(drawing._id, -likeValue);
           updateLikes(drawing._id);
-          setDrawingLikes(drawingLikes - 1);
+          setDrawingLikes(drawingLikes - likeValue);
         } else {
-          likeDrawing(drawing._id, 1);
+          likeDrawing(drawing._id, likeValue);
           updateLikes(drawing._id);
-          setDrawingLikes(drawingLikes + 1);
+          setDrawingLikes(drawingLikes + likeValue);
         }
       }}
     >

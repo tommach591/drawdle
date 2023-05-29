@@ -131,6 +131,16 @@ export function useUpdateLikes() {
   return useContext(UpdateLikesContext);
 }
 
+const TodayContext = createContext();
+export function useToday() {
+  return useContext(TodayContext);
+}
+
+const SkipDaysContext = createContext();
+export function useSkipDays() {
+  return useContext(SkipDaysContext);
+}
+
 export function CanvasProvider({ children }) {
   const [primary, setPrimary] = useState("#000000");
   const [secondary, setSecondary] = useState("#FFFFFF");
@@ -140,6 +150,7 @@ export function CanvasProvider({ children }) {
   const [BRUSH, ERASER] = [0, 1];
   const [tool, setTool] = useState(BRUSH);
   const [redraw, setRedraw] = useState(false);
+  const [today, setToday] = useState(new Date());
   const [word, setWord] = useState("");
 
   const [drawings, setDrawings] = useState({});
@@ -162,17 +173,20 @@ export function CanvasProvider({ children }) {
     // localStorage.clear();
     let storedDrawings = JSON.parse(localStorage.getItem("drawings"));
     let storedLikes = JSON.parse(localStorage.getItem("likes"));
-
     if (!storedDrawings) storedDrawings = {};
     if (!storedLikes) storedLikes = [];
-
-    console.log(storedDrawings);
-    console.log(storedLikes);
 
     setDrawings(storedDrawings);
     setLikes(new Set(storedLikes));
 
-    getWord().then((res) => {
+    console.log(storedDrawings);
+    console.log(storedLikes);
+
+    const nextDay = new Date(today);
+    nextDay.setDate(nextDay.getDate() + 1);
+    nextDay.setHours(0, 0, 0, 0);
+
+    getWord(today).then((res) => {
       if (res) {
         setWord(res.word);
       } else {
@@ -182,27 +196,37 @@ export function CanvasProvider({ children }) {
       }
     });
 
-    const currentTime = new Date();
-    const nextDay = new Date(currentTime);
-    nextDay.setDate(nextDay.getDate() + 1);
-    nextDay.setHours(0, 0, 0, 0);
-
     const interval = setInterval(() => {
       alert("New day, new drawdle!");
-      getWord().then((res) => {
-        if (res) {
-          setWord(res.word);
-        } else {
-          postDaily().then((res) => {
-            setWord(res.word);
-          });
-        }
+      postDaily().then((res) => {
+        setWord(res.word);
+        setToday(new Date());
       });
-    }, nextDay - currentTime);
+    }, nextDay - today);
+
     return () => {
       clearInterval(interval);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const skipDays = useCallback(
+    (change) => {
+      const newDay = new Date(today);
+      newDay.setDate(newDay.getDate() + change);
+      newDay.setHours(0, 0, 0, 0);
+
+      getWord(newDay).then((res) => {
+        if (res) {
+          setWord(res.word);
+          setToday(newDay);
+        } else {
+          alert("You have reached the end :(");
+        }
+      });
+    },
+    [today]
+  );
 
   const handleUndo = useCallback(() => {
     if (drawHistory.length > 0) {
@@ -312,7 +336,15 @@ export function CanvasProvider({ children }) {
                                                     <UpdateLikesContext.Provider
                                                       value={updateLikes}
                                                     >
-                                                      {children}
+                                                      <TodayContext.Provider
+                                                        value={today}
+                                                      >
+                                                        <SkipDaysContext.Provider
+                                                          value={skipDays}
+                                                        >
+                                                          {children}
+                                                        </SkipDaysContext.Provider>
+                                                      </TodayContext.Provider>
                                                     </UpdateLikesContext.Provider>
                                                   </LikesContext.Provider>
                                                 </UpdateDrawingContext.Provider>

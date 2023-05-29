@@ -12,14 +12,23 @@
   overflow-y: scroll;
 }
 
-.SortGrid {
+.ScrollToTop {
+  width: 3rem;
+  height: 3rem;
+
+  position: fixed;
+  bottom: 2%;
+  right: 3%;
+}
+
+.CommandGrid {
   display: flex;
   justify-content: center;
 
   margin-bottom: 0.5rem;
 }
 
-.SortOption {
+.CommandOption {
   width: 5rem;
   height: 1.5rem;
 
@@ -37,8 +46,33 @@
 
   background: white;
 
-  font-family: "Darumadrop One", cursive;
+  font-family: "Itim", cursive;
   font-size: 14px;
+}
+
+.ChangeDate {
+  width: 4rem;
+  height: 1.5rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  border: 1px solid black;
+
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+
+  background: white;
+
+  font-family: "Itim", cursive;
+  font-size: 14px;
+}
+
+.ChangeDate:active {
+  background: rgb(190, 190, 190);
 }
 
 .DrawingGrid {

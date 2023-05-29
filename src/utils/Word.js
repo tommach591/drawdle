@@ -1,7 +1,7 @@
 const serverURL = "http://localhost:3001";
 
-export function getWord() {
-  return fetch(`${serverURL}/api/word/get`)
+export function getWord(date) {
+  return fetch(`${serverURL}/api/word/get/${date.toDateString()}`)
     .then((res) => {
       if (res.ok) return res.json();
       else return;
