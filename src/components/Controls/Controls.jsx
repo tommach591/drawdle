@@ -186,6 +186,7 @@ function Controls() {
             saveDrawing(drawHistory).then((res) => {
               addDrawing(res._id);
             });
+            alert("Submitted!");
             handleClear();
           }}
         >
