@@ -1,4 +1,4 @@
-# Drawdle
+# Drewdle (Drawdle was taken)
 
 The daily doodle web app!
 
