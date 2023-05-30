@@ -1,4 +1,4 @@
-const serverURL = "http://localhost:3001";
+const serverURL = "https://drawdle.herokuapp.com";
 
 export function getDrawings(date, byLikes, limit, offset) {
   return fetch(
