@@ -179,9 +179,6 @@ export function CanvasProvider({ children }) {
     setDrawings(storedDrawings);
     setLikes(new Set(storedLikes));
 
-    console.log(storedDrawings);
-    console.log(storedLikes);
-
     const nextDay = new Date(today);
     nextDay.setDate(nextDay.getDate() + 1);
     nextDay.setHours(0, 0, 0, 0);
@@ -191,6 +188,7 @@ export function CanvasProvider({ children }) {
         setWord(res.word);
       } else {
         postDaily().then((res) => {
+          console.log(res.word);
           setWord(res.word);
         });
       }
