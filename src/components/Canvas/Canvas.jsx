@@ -13,7 +13,7 @@ import {
   useSize,
   useTool,
   useUpdateColorHistory,
-} from "../../utils/CanvasContext";
+} from "../../utils/DrawdleContext";
 import { useMobile } from "../../utils/useMobile";
 
 function Canvas() {

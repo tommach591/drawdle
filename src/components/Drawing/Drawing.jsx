@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./Drawing.css";
 import { likeDrawing } from "../../utils/Drawing";
-import { useLikes, useUpdateLikes } from "../../utils/CanvasContext";
+import { useLikes, useUpdateLikes } from "../../utils/DrawdleContext";
 
 function Drawing({ drawing, drawingWidth, drawingHeight }) {
   const offscreenRef = useRef(null);

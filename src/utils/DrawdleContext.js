@@ -170,7 +170,7 @@ export function CanvasProvider({ children }) {
   ]);
 
   useEffect(() => {
-    localStorage.clear();
+    // localStorage.clear();
     let storedDrawings = JSON.parse(localStorage.getItem("drawings"));
     let storedLikes = JSON.parse(localStorage.getItem("likes"));
     if (!storedDrawings) storedDrawings = {};

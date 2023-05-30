@@ -9,3 +9,14 @@
   margin-top: 3rem;
   overflow: hidden;
 }
+
+.CanvasContainer {
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  overflow: hidden;
+}

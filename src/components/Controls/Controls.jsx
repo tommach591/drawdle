@@ -15,7 +15,7 @@ import {
   useColorHistory,
   useDrawHistory,
   useUpdateDrawing,
-} from "../../utils/CanvasContext";
+} from "../../utils/DrawdleContext";
 import { useMobile } from "../../utils/useMobile";
 import { usePortrait } from "../../utils/usePortrait";
 import "./Controls.css";

@@ -1,12 +1,12 @@
 import "./Gallery.css";
 import { useMobile } from "../../utils/useMobile";
 import { usePortrait } from "../../utils/usePortrait";
-import { useSkipDays, useToday, useWord } from "../../utils/CanvasContext";
+import { useSkipDays, useToday, useWord } from "../../utils/DrawdleContext";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Drawing from "../Drawing";
 import { getDrawings } from "../../utils/Drawing";
 
-function Gallery({ appRef }) {
+function Gallery() {
   const isMobile = useMobile();
   const isPortrait = usePortrait();
   const word = useWord();
@@ -62,8 +62,8 @@ function Gallery({ appRef }) {
   };
 
   const handleClickScroll = () => {
-    if (appRef.current) {
-      appRef.current.scrollIntoView({ block: "start", behavior: "smooth" });
+    if (galleryRef.current) {
+      galleryRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -71,14 +71,18 @@ function Gallery({ appRef }) {
     <div className="Gallery" onScroll={onScroll} ref={galleryRef}>
       {isMobile ? (
         isPortrait ? (
-          <div />
+          <h1 className="Word" style={{ top: "-0.15rem" }}>
+            {word}
+          </h1>
         ) : (
           <h1 className="Word" style={{ marginBottom: "10px" }}>
             {word}
           </h1>
         )
       ) : (
-        <div />
+        <h1 className="Word" style={{ top: "-0.15rem" }}>
+          {word}
+        </h1>
       )}
       <div className="CommandGrid">
         <div
