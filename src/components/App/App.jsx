@@ -6,8 +6,9 @@ import Header from "../Header";
 import Home from "../Home";
 import Gallery from "../Gallery";
 import { usePing } from "../../utils/usePing";
-import { deleteAllWords } from "../../utils/Word";
-import { deleteAllDrawings } from "../../utils/Drawing";
+import { useRef } from "react";
+// import { deleteAllWords } from "../../utils/Word";
+// import { deleteAllDrawings } from "../../utils/Drawing";
 
 function App() {
   const isMobile = useMobile();
@@ -19,22 +20,28 @@ function App() {
   const currentTime = new Date();
   const currentDay = new Date(currentTime.toDateString());
 
+  const appRef = useRef();
+
   // deleteAllWords();
   // deleteAllDrawings();
 
   return ping ? (
-    <div className="App">
+    <div className="App" ref={appRef}>
       <Header />
       {isMobile ? (
         isPortrait ? (
-          <h1 className="Word">{word}</h1>
+          <h1 className="Word" style={{ top: "2.75rem" }}>
+            {word}
+          </h1>
         ) : (
           <div />
         )
       ) : (
-        <h1 className="Word">{word}</h1>
+        <h1 className="Word" style={{ top: "2.75rem" }}>
+          {word}
+        </h1>
       )}
-      {drawings[currentDay] ? <Gallery /> : <Home />}
+      {drawings[currentDay] ? <Gallery appRef={appRef} /> : <Home />}
     </div>
   ) : (
     <div />

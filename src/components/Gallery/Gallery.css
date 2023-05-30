@@ -1,15 +1,12 @@
 .Gallery {
   width: 100%;
-  height: 100%;
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  margin-top: 0.5rem;
+  margin-top: 3rem;
   margin-bottom: 1rem;
-
-  overflow-y: scroll;
 }
 
 .ScrollToTop {
@@ -88,7 +85,6 @@
 
 .ChangeDate:hover {
   cursor: pointer;
-  background: rgb(220, 220, 220);
 }
 
 .ChangeDate:active {

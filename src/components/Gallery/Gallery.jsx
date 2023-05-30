@@ -2,12 +2,11 @@ import "./Gallery.css";
 import { useMobile } from "../../utils/useMobile";
 import { usePortrait } from "../../utils/usePortrait";
 import { useSkipDays, useToday, useWord } from "../../utils/CanvasContext";
-
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Drawing from "../Drawing";
 import { getDrawings } from "../../utils/Drawing";
 
-function Gallery() {
+function Gallery({ appRef }) {
   const isMobile = useMobile();
   const isPortrait = usePortrait();
   const word = useWord();
@@ -25,7 +24,7 @@ function Gallery() {
 
   const fetchMoreDrawings = useCallback(
     (prev) => {
-      const limit = 10;
+      const limit = 30;
       getDrawings(today, sort, limit, prev.length).then((res) => {
         setSample([...prev, ...res]);
       });
@@ -44,7 +43,7 @@ function Gallery() {
     yesterday.setHours(0, 0, 0, 0);
 
     const tomorrow = new Date(today);
-    tomorrow.setDate(yesterday.getDate() + 1);
+    tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
 
     setOtherDays({
@@ -63,8 +62,8 @@ function Gallery() {
   };
 
   const handleClickScroll = () => {
-    if (galleryRef.current) {
-      galleryRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    if (appRef.current) {
+      appRef.current.scrollIntoView({ block: "start", behavior: "smooth" });
     }
   };
 
@@ -94,7 +93,7 @@ function Gallery() {
         </div>
         <div
           className="CommandOption"
-          style={sort === "recent" ? { background: "rgb(190, 190, 190)" } : {}}
+          style={sort === "recent" ? { background: "rgb(200, 200, 200)" } : {}}
           onClick={() => {
             setSort("recent");
           }}
@@ -103,7 +102,7 @@ function Gallery() {
         </div>
         <div
           className="CommandOption"
-          style={sort === "likes" ? { background: "rgb(190, 190, 190)" } : {}}
+          style={sort === "likes" ? { background: "rgb(200, 200, 200)" } : {}}
           onClick={() => {
             setSort("likes");
           }}
