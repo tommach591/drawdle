@@ -151,6 +151,7 @@ export function CanvasProvider({ children }) {
   const [tool, setTool] = useState(BRUSH);
   const [redraw, setRedraw] = useState(true);
   const [today, setToday] = useState(new Date());
+  const [tomorrow, setTomorrow] = useState(new Date());
   const [word, setWord] = useState("");
 
   const [drawings, setDrawings] = useState({});
@@ -192,6 +193,7 @@ export function CanvasProvider({ children }) {
     const nextDay = new Date(PST);
     nextDay.setDate(nextDay.getDate() + 1);
     nextDay.setHours(0, 0, 0, 0);
+    setTomorrow(nextDay);
 
     getWord(PST).then((res) => {
       if (res) {
@@ -202,7 +204,10 @@ export function CanvasProvider({ children }) {
         });
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  useEffect(() => {
     const interval = setInterval(() => {
       alert("New day, new drawdle!");
       postDaily().then((res) => {
@@ -214,14 +219,19 @@ export function CanvasProvider({ children }) {
           })
         );
         setToday(PST);
+
+        const nextDay = new Date(PST);
+        nextDay.setDate(nextDay.getDate() + 1);
+        nextDay.setHours(0, 0, 0, 0);
+        setTomorrow(nextDay);
       });
-    }, nextDay - today);
+    }, tomorrow - today);
 
     return () => {
       clearInterval(interval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tomorrow]);
 
   const skipDays = useCallback(
     (change) => {
