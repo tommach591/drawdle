@@ -183,11 +183,17 @@ export function CanvasProvider({ children }) {
     setLikes(new Set(storedLikes));
     setDrawHistory(storedDrawHistory);
 
-    const nextDay = new Date(today);
+    const currentTime = new Date();
+    const PST = new Date(
+      currentTime.toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
+    );
+    setToday(PST);
+
+    const nextDay = new Date(PST);
     nextDay.setDate(nextDay.getDate() + 1);
     nextDay.setHours(0, 0, 0, 0);
 
-    getWord(today).then((res) => {
+    getWord(PST).then((res) => {
       if (res) {
         setWord(res.word);
       } else {
@@ -201,7 +207,13 @@ export function CanvasProvider({ children }) {
       alert("New day, new drawdle!");
       postDaily().then((res) => {
         setWord(res.word);
-        setToday(new Date());
+        const currentTime = new Date();
+        const PST = new Date(
+          currentTime.toLocaleString("en-US", {
+            timeZone: "America/Los_Angeles",
+          })
+        );
+        setToday(PST);
       });
     }, nextDay - today);
 
@@ -276,9 +288,12 @@ export function CanvasProvider({ children }) {
     (drawing_id) => {
       const newDrawings = JSON.parse(JSON.stringify(drawings));
       const currentTime = new Date();
-      const currentDay = `${currentTime.getFullYear()}${
-        currentTime.getMonth() + 1
-      }${currentTime.getDate()}`;
+      const PST = new Date(
+        currentTime.toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
+      );
+      const currentDay = `${PST.getFullYear()}${
+        PST.getMonth() + 1
+      }${PST.getDate()}`;
 
       newDrawings[currentDay] = drawing_id;
       setDrawings(newDrawings);
