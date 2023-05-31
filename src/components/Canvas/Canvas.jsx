@@ -128,6 +128,7 @@ function Canvas() {
         drawStroke(ctx, stroke);
       }
       setRedraw(false);
+      localStorage.setItem("drawHistory", JSON.stringify(drawHistory));
     }
   }, [canvasCTX, drawHistory, setRedraw, drawStroke]);
 
@@ -194,6 +195,16 @@ function Canvas() {
       window.removeEventListener("keyup", handleKeyUp);
     };
   }, [keys, handleUndo, handleRedo]);
+
+  useEffect(() => {
+    const handleContextMenu = (event) => {
+      event.preventDefault();
+    };
+    document.addEventListener("contextmenu", handleContextMenu);
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+    };
+  }, []);
 
   return (
     <div className="Canvas">

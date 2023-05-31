@@ -149,7 +149,7 @@ export function CanvasProvider({ children }) {
   const [redoHistory, setRedoHistory] = useState([]);
   const [BRUSH, ERASER] = [0, 1];
   const [tool, setTool] = useState(BRUSH);
-  const [redraw, setRedraw] = useState(false);
+  const [redraw, setRedraw] = useState(true);
   const [today, setToday] = useState(new Date());
   const [word, setWord] = useState("");
 
@@ -173,11 +173,15 @@ export function CanvasProvider({ children }) {
     // localStorage.clear();
     let storedDrawings = JSON.parse(localStorage.getItem("drawings"));
     let storedLikes = JSON.parse(localStorage.getItem("likes"));
+    let storedDrawHistory = JSON.parse(localStorage.getItem("drawHistory"));
+
     if (!storedDrawings) storedDrawings = {};
     if (!storedLikes) storedLikes = [];
+    if (!storedDrawHistory) storedDrawHistory = [];
 
     setDrawings(storedDrawings);
     setLikes(new Set(storedLikes));
+    setDrawHistory(storedDrawHistory);
 
     const nextDay = new Date(today);
     nextDay.setDate(nextDay.getDate() + 1);
@@ -249,6 +253,7 @@ export function CanvasProvider({ children }) {
     setDrawHistory([]);
     setRedoHistory([]);
     setRedraw(true);
+    localStorage.setItem("drawHistory", JSON.stringify([]));
   }, []);
 
   const updateColorHistory = useCallback(() => {

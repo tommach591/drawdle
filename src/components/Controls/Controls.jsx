@@ -184,9 +184,14 @@ function Controls() {
           className="BigButton"
           onClick={() => {
             saveDrawing(drawHistory).then((res) => {
-              addDrawing(res._id);
+              if (res) {
+                alert("Submitted!");
+                addDrawing(res._id);
+                handleClear();
+              } else {
+                alert("Uh oh, an error occured!");
+              }
             });
-            alert("Submitted!");
           }}
         >
           Submit
