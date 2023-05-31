@@ -210,8 +210,8 @@ export function CanvasProvider({ children }) {
   useEffect(() => {
     const interval = setInterval(() => {
       alert("New day, new drawdle!");
-      postDaily().then((res) => {
-        setWord(res.word);
+
+      const setTimer = () => {
         const currentTime = new Date();
         const PST = new Date(
           currentTime.toLocaleString("en-US", {
@@ -224,6 +224,18 @@ export function CanvasProvider({ children }) {
         nextDay.setDate(nextDay.getDate() + 1);
         nextDay.setHours(0, 0, 0, 0);
         setTomorrow(nextDay);
+      };
+
+      getWord(tomorrow).then((res) => {
+        if (res) {
+          setWord(res.word);
+          setTimer();
+        } else {
+          postDaily().then((res) => {
+            setWord(res.word);
+            setTimer();
+          });
+        }
       });
     }, tomorrow - today);
 
