@@ -187,7 +187,6 @@ function Controls() {
               addDrawing(res._id);
             });
             alert("Submitted!");
-            handleClear();
           }}
         >
           Submit
