@@ -12,7 +12,9 @@ function App() {
   const drawings = useDrawing();
 
   const currentTime = new Date();
-  const currentDay = new Date(currentTime.toDateString());
+  const currentDay = `${currentTime.getFullYear()}${
+    currentTime.getMonth() + 1
+  }${currentTime.getDate()}`;
 
   // deleteAllWords();
   // deleteAllDrawings();

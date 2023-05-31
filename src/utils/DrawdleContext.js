@@ -158,13 +158,13 @@ export function CanvasProvider({ children }) {
 
   const [colorHistory, setColorHistory] = useState([
     "#000000",
-    "#ff0000",
-    "#00ff00",
-    "#0000ff",
-    "#ffffff",
-    "#ffffff",
-    "#ffffff",
-    "#ffffff",
+    "#ff2222",
+    "#ffa522",
+    "#ffff55",
+    "#22cc22",
+    "#3333ff",
+    "#4b33cc",
+    "#8f44ff",
     "#ffffff",
     "#ffffff",
   ]);
@@ -188,7 +188,6 @@ export function CanvasProvider({ children }) {
         setWord(res.word);
       } else {
         postDaily().then((res) => {
-          console.log(res.word);
           setWord(res.word);
         });
       }
@@ -272,7 +271,9 @@ export function CanvasProvider({ children }) {
     (drawing_id) => {
       const newDrawings = JSON.parse(JSON.stringify(drawings));
       const currentTime = new Date();
-      const currentDay = new Date(currentTime.toDateString());
+      const currentDay = `${currentTime.getFullYear()}${
+        currentTime.getMonth() + 1
+      }${currentTime.getDate()}`;
 
       newDrawings[currentDay] = drawing_id;
       setDrawings(newDrawings);
