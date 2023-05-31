@@ -157,10 +157,10 @@ export function CanvasProvider({ children }) {
   const [likes, setLikes] = useState(new Set());
 
   const [colorHistory, setColorHistory] = useState([
-    "#ffffff",
-    "#ffffff",
-    "#ffffff",
-    "#ffffff",
+    "#000000",
+    "#ff0000",
+    "#00ff00",
+    "#0000ff",
     "#ffffff",
     "#ffffff",
     "#ffffff",
