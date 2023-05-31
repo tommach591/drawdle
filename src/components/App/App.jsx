@@ -12,9 +12,12 @@ function App() {
   const drawings = useDrawing();
 
   const currentTime = new Date();
-  const currentDay = `${currentTime.getFullYear()}${
-    currentTime.getMonth() + 1
-  }${currentTime.getDate()}`;
+  const PST = new Date(
+    currentTime.toLocaleString("en-US", { timeZone: "America/Los_Angeles" })
+  );
+  const currentDay = `${PST.getFullYear()}${
+    PST.getMonth() + 1
+  }${PST.getDate()}`;
 
   // deleteAllWords();
   // deleteAllDrawings();
