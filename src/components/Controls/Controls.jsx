@@ -182,14 +182,17 @@ function Controls() {
         </button>
         <button
           className="BigButton"
-          onClick={() => {
+          onClick={(event) => {
+            event.currentTarget.disabled = true;
             saveDrawing(drawHistory).then((res) => {
               if (res) {
                 alert("Submitted!");
                 addDrawing(res._id);
                 handleClear();
+                event.currentTarget.disabled = false;
               } else {
                 alert("Uh oh, an error occured!");
+                event.currentTarget.disabled = false;
               }
             });
           }}
