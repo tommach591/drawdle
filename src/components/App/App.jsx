@@ -28,7 +28,12 @@ function App() {
       {drawings[currentDay] ? <Gallery /> : <Home />}
     </div>
   ) : (
-    <div />
+    <div className="Loading">
+      <img
+        src="https://media.tenor.com/3rLdVGILFeIAAAAi/drawing-sketch.gif"
+        alt="Loading"
+      />
+    </div>
   );
 }
 
