@@ -1,4 +1,4 @@
-# Drewdle (Drawdle was taken)
+# Drewdle
 
 The daily doodle web app!
 
@@ -8,4 +8,4 @@ The daily doodle web app!
 2. Set up server and update serverURL in Word.js and Drawing.js.
 3. npm run
 
-### Server @ https://github.com/tommach591/drawdle-server
+### Server @ https://github.com/tommach591/drewdle-server
