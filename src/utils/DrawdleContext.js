@@ -176,7 +176,10 @@ export function CanvasProvider({ children }) {
     let storedLikes = JSON.parse(localStorage.getItem("likes"));
     let storedDrawHistory = JSON.parse(localStorage.getItem("drawHistory"));
 
-    if (!storedDrawings) storedDrawings = {};
+    if (!storedDrawings) {
+      storedDrawings = {};
+      alert("Draw the daily word! Keep it simple or it might not submit!");
+    }
     if (!storedLikes) storedLikes = [];
     if (!storedDrawHistory) storedDrawHistory = [];
 
