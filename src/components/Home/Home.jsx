@@ -3,20 +3,12 @@ import Canvas from "../Canvas";
 import Controls from "../Controls";
 import { usePortrait } from "../../utils/usePortrait";
 import { useMobile } from "../../utils/useMobile";
-import { useDrawing, useWord } from "../../utils/DrawdleContext";
-import { useEffect } from "react";
+import { useWord } from "../../utils/DrawdleContext";
 
 function Home() {
   const isMobile = useMobile();
   const isPortrait = usePortrait();
   const word = useWord();
-  const drawings = useDrawing();
-
-  useEffect(() => {
-    if (Object.keys(drawings).length === 0) {
-      alert("Draw the daily word! Keep it simple!");
-    }
-  });
 
   return (
     <div className="Home">
