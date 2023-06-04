@@ -274,6 +274,9 @@ function Canvas() {
           }
         />
       </div>
+      <h1 className="Footer">
+        Draw the word! Complex drawings have trouble submitting!
+      </h1>
     </div>
   );
 }

@@ -130,20 +130,20 @@ function Gallery() {
         alt=""
         onClick={() => handleClickScroll()}
       />
-      <div
-        className="DrawingGrid"
-        style={
-          isMobile
-            ? isPortrait
-              ? { gridTemplateColumns: `repeat(1, ${drawingWidth}px)` }
-              : { gridTemplateColumns: `repeat(3, ${drawingWidth}px)` }
-            : {
-                gridTemplateColumns: `repeat(5, ${drawingWidth}px)`,
-              }
-        }
-      >
-        {sample ? (
-          sample.map((drawing, i) => {
+      {sample && sample.length > 0 ? (
+        <div
+          className="DrawingGrid"
+          style={
+            isMobile
+              ? isPortrait
+                ? { gridTemplateColumns: `repeat(1, ${drawingWidth}px)` }
+                : { gridTemplateColumns: `repeat(3, ${drawingWidth}px)` }
+              : {
+                  gridTemplateColumns: `repeat(5, ${drawingWidth}px)`,
+                }
+          }
+        >
+          {sample.map((drawing, i) => {
             return (
               <Drawing
                 key={i}
@@ -152,11 +152,13 @@ function Gallery() {
                 drawingHeight={drawingHeight}
               />
             );
-          })
-        ) : (
-          <div />
-        )}
-      </div>
+          })}
+        </div>
+      ) : (
+        <div className="Empty">
+          <h1>No Drawings :(</h1>
+        </div>
+      )}
     </div>
   );
 }

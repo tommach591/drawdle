@@ -1,6 +1,14 @@
 .Canvas {
   display: flex;
+  flex-direction: column;
   margin-top: 0.1rem;
+}
+
+.Footer {
+  margin-top: 0.25rem;
+  text-align: center;
+  font-size: 11px;
+  font-family: "Itim", cursive;
 }
 
 .Whiteboard {
