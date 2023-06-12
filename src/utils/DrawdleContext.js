@@ -199,7 +199,7 @@ export function CanvasProvider({ children }) {
       if (res) {
         setWord(res.word);
       } else {
-        postDaily().then((res) => {
+        postDaily(PST).then((res) => {
           setWord(res.word);
         });
       }
@@ -231,7 +231,7 @@ export function CanvasProvider({ children }) {
           setWord(res.word);
           setTimer();
         } else {
-          postDaily().then((res) => {
+          postDaily(tomorrow).then((res) => {
             setWord(res.word);
             setTimer();
           });
@@ -247,6 +247,8 @@ export function CanvasProvider({ children }) {
 
   const skipDays = useCallback(
     (change) => {
+      const latestDay = new Date();
+
       const newDay = new Date(today);
       newDay.setDate(newDay.getDate() + change);
       newDay.setHours(0, 0, 0, 0);
@@ -255,8 +257,13 @@ export function CanvasProvider({ children }) {
         if (res) {
           setWord(res.word);
           setToday(newDay);
+        } else if (newDay > latestDay) {
+          alert("Wait for tomorrow!");
         } else {
-          alert("You have reached the end :(");
+          postDaily(newDay).then((res) => {
+            setWord(res.word);
+            setToday(newDay);
+          });
         }
       });
     },

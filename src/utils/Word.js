@@ -9,13 +9,18 @@ export function getWord(date) {
     .catch((err) => console.error(err));
 }
 
-export function postDaily() {
+export function postDaily(date) {
+  const body = {
+    date: date.toDateString(),
+  };
+
   return fetch(`${serverURL}/api/word/daily`, {
     method: "POST",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
     },
+    body: JSON.stringify(body),
   })
     .then((res) => {
       if (res.ok) return res.json();
